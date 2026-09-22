@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Maillage — réseau de formation IA</title>
+<meta name="description" content="Démo d'espace communautaire pour un réseau national de formation à l'IA : espaces par région, salons texte et salons vocaux.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --ground:#F2F4EF;
+    --surface:#FFFFFF;
+    --surface-2:#E9ECE4;
+    --surface-3:#E0E4D9;
+    --ink:#16201C;
+    --ink-2:#5A665F;
+    --ink-3:#8B958E;
+    --line:#DBE0D6;
+    --line-2:#C9D0C3;
+    --accent:#0E6E5B;
+    --accent-ink:#0A5344;
+    --accent-soft:#DDEBE4;
+    --warm:#A9511D;
+    --warm-soft:#F4E6DA;
+    --slate:#3A5A72;
+    --slate-soft:#DFE8EE;
+    --alert:#9A3412;
+    --alert-soft:#F7E2D8;
+    --on-accent:#FFFFFF;
+    --shadow:0 1px 2px rgba(22,32,28,.06), 0 8px 24px -18px rgba(22,32,28,.5);
+    --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+    --body:'Source Sans 3',-apple-system,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --ground:#111614; --surface:#191F1C; --surface-2:#212925; --surface-3:#2A332E;
+      --ink:#E7EDE8; --ink-2:#A2ADA6; --ink-3:#73807A;
+      --line:#2A332E; --line-2:#39443D;
+      --accent:#57C4A5; --accent-ink:#8FDCC3; --accent-soft:#15312A;
+      --warm:#E0884F; --warm-soft:#33210F;
+      --slate:#8DB2CE; --slate-soft:#1A2831;
+      --alert:#F08A5D; --alert-soft:#341A11;
+      --on-accent:#0B1512;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --ground:#111614; --surface:#191F1C; --surface-2:#212925; --surface-3:#2A332E;
+    --ink:#E7EDE8; --ink-2:#A2ADA6; --ink-3:#73807A;
+    --line:#2A332E; --line-2:#39443D;
+    --accent:#57C4A5; --accent-ink:#8FDCC3; --accent-soft:#15312A;
+    --warm:#E0884F; --warm-soft:#33210F;
+    --slate:#8DB2CE; --slate-soft:#1A2831;
+    --alert:#F08A5D; --alert-soft:#341A11;
+    --on-accent:#0B1512;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  html{padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--body); font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;}
+  [hidden]{display:none !important;}
+  h1,h2,h3,h4{font-family:var(--display); font-weight:700; line-height:1.15; margin:0; text-wrap:balance;}
+  p{margin:0;}
+  button{font:inherit; color:inherit; cursor:pointer; font-family:inherit;}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px;}
+
+  /* ====================== structure ====================== */
+  .app{
+    height:100%;
+    display:grid;
+    grid-template-columns:74px 250px minmax(0,1fr) 236px;
+    overflow:hidden;
+  }
+  .col{overflow-y:auto; overflow-x:hidden; min-width:0;}
+  .spaces{background:var(--surface-2); border-right:1px solid var(--line); padding:10px 0; display:flex; flex-direction:column; align-items:center; gap:7px;}
+  .chans{background:var(--surface); border-right:1px solid var(--line); display:flex; flex-direction:column;}
+  .stage{display:flex; flex-direction:column; background:var(--ground);}
+  .people{background:var(--surface); border-left:1px solid var(--line); padding:14px 13px 30px;}
+
+  @media (max-width:1180px){
+    .app{grid-template-columns:70px 230px minmax(0,1fr);}
+    .people{display:none;}
+  }
+  @media (max-width:900px){
+    html,body{height:auto;}
+    .app{height:auto; grid-template-columns:minmax(0,1fr); overflow:visible;}
+    .col{overflow:visible;}
+    .spaces{flex-direction:row; justify-content:flex-start; overflow-x:auto; border-right:0; border-bottom:1px solid var(--line); padding:9px 12px; position:sticky; top:0; z-index:12;}
+    .chans{border-right:0; border-bottom:1px solid var(--line);}
+    .chans-body{max-height:236px; overflow:auto;}
+    .stage{min-height:60vh;}
+    .composer{padding-bottom:104px;}
+    .voicebar{position:fixed; left:0; right:0; bottom:0; z-index:30; border-top:1px solid var(--line); padding-bottom:calc(9px + env(safe-area-inset-bottom,0px));}
+    .feed-scroll{overflow:visible !important;}
+  }
+
+  /* ====================== espaces ====================== */
+  .sp{
+    width:46px; height:46px; flex:none; border-radius:15px; border:1px solid var(--line-2);
+    background:var(--surface); color:var(--ink-2);
+    font-family:var(--display); font-weight:800; font-size:14px; letter-spacing:-.02em;
+    display:grid; place-items:center; position:relative; transition:border-radius .15s, background .15s;
+  }
+  .sp:hover{border-radius:12px;}
+  .sp[aria-current="true"]{background:var(--ink); color:var(--ground); border-color:var(--ink); border-radius:12px;}
+  .sp .bulle{
+    position:absolute; right:-3px; top:-3px; min-width:17px; height:17px; padding:0 4px;
+    border-radius:999px; background:var(--alert); color:#fff;
+    font-family:var(--mono); font-size:9.5px; display:grid; place-items:center; border:2px solid var(--surface-2);
+  }
+  .sp-sep{width:26px; height:1px; background:var(--line-2); flex:none; margin:3px 0;}
+  .sp-lab{font-family:var(--mono); font-size:8.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); margin-top:-3px;}
+  @media (max-width:900px){ .sp-lab{display:none;} .sp-sep{width:1px; height:26px; margin:0 4px;} }
+
+  /* ====================== salons ====================== */
+  .chans-head{padding:14px 15px 12px; border-bottom:1px solid var(--line);}
+  .chans-head .k{font-family:var(--mono); font-size:9.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3);}
+  .chans-head h2{font-size:17px; letter-spacing:-.01em; margin-top:2px;}
+  .chans-body{flex:1 1 auto; padding:10px 8px 14px;}
+  .cgroup{font-family:var(--mono); font-size:9.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); padding:13px 8px 5px;}
+  .ch{
+    width:100%; display:grid; grid-template-columns:16px 1fr auto; gap:8px; align-items:center;
+    background:transparent; border:0; border-radius:7px; padding:6px 8px; text-align:left; color:var(--ink-2);
+  }
+  .ch:hover{background:var(--surface-2);}
+  .ch[aria-current="true"]{background:var(--surface-3); color:var(--ink);}
+  .ch .hash{font-family:var(--mono); font-size:14px; color:var(--ink-3); text-align:center;}
+  .ch .nm{font-size:14px; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .ch.unread .nm{font-weight:700; color:var(--ink);}
+  .ch .cnt{font-family:var(--mono); font-size:9.5px; min-width:17px; height:17px; padding:0 5px; border-radius:999px; background:var(--alert); color:#fff; display:grid; place-items:center;}
+  .ch .vc{font-family:var(--mono); font-size:10px; color:var(--ink-3);}
+  .ch.live{color:var(--accent-ink);}
+  .vmembers{display:grid; gap:3px; padding:1px 0 5px 32px;}
+  .vmem{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-2);}
+  .vmem .avatar{width:20px; height:20px; font-size:8.5px;}
+
+  /* ====================== barre vocale ====================== */
+  .voicebar{background:var(--surface-2); border-top:1px solid var(--line); padding:9px 11px; display:grid; gap:8px;}
+  .voicebar .state{display:flex; align-items:center; gap:8px;}
+  .voicebar .state .led{width:8px; height:8px; border-radius:50%; background:var(--accent); flex:none; box-shadow:0 0 0 3px var(--accent-soft);}
+  .voicebar .state .txt{min-width:0;}
+  .voicebar .state b{display:block; font-size:12.5px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .voicebar .state span{font-family:var(--mono); font-size:9.5px; color:var(--ink-3);}
+  .vtools{display:flex; gap:5px; flex-wrap:wrap;}
+  .vt{
+    flex:1 1 auto; min-width:36px; height:32px; border-radius:8px; border:1px solid var(--line-2);
+    background:var(--surface); color:var(--ink-2); display:grid; place-items:center; padding:0;
+  }
+  .vt:hover{border-color:var(--ink-3);}
+  .vt[aria-pressed="true"]{background:var(--alert-soft); border-color:var(--alert); color:var(--alert);}
+  .vt.quit{background:var(--alert); border-color:var(--alert); color:#fff; flex:0 0 42px;}
+  .meter{height:5px; border-radius:3px; background:var(--surface-3); overflow:hidden;}
+  .meter i{display:block; height:100%; width:0%; background:var(--accent); border-radius:3px; transition:width .07s linear;}
+  .meter.muet i{background:var(--alert);}
+  .ptt-hint{font-family:var(--mono); font-size:9.5px; color:var(--ink-3); text-align:center;}
+
+  /* ====================== scène ====================== */
+  .stage-head{
+    padding:12px 18px; border-bottom:1px solid var(--line); background:var(--surface);
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap; position:sticky; top:0; z-index:10;
+  }
+  .stage-head .ttl{display:flex; align-items:baseline; gap:9px; min-width:0;}
+  .stage-head h1{font-size:17px; letter-spacing:-.01em; white-space:nowrap;}
+  .stage-head .sujet{font-size:12.5px; color:var(--ink-3); border-left:1px solid var(--line-2); padding-left:9px; min-width:0;}
+  @media (max-width:640px){ .stage-head .sujet{display:none;} }
+  .search{display:flex; align-items:center; gap:7px; background:var(--ground); border:1px solid var(--line); border-radius:8px; padding:5px 9px; margin-left:auto; max-width:250px; flex:1 1 150px;}
+  .search input{border:0; background:transparent; font:inherit; font-size:13.5px; color:inherit; width:100%; outline:none; min-width:0;}
+  .me-chip{display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-3);}
+
+  .feed-scroll{flex:1 1 auto; overflow-y:auto; padding:6px 0 4px;}
+  .feed{padding:8px 18px 12px; display:flex; flex-direction:column; gap:2px;}
+
+  /* ====================== messages ====================== */
+  .msg{display:grid; grid-template-columns:38px minmax(0,1fr); gap:11px; padding:7px 10px; border-radius:9px;}
+  .msg:hover{background:var(--surface);}
+  .msg.pin{background:var(--warm-soft);}
+  .msg .head{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+  .msg .who{font-weight:700;}
+  .msg .role{font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; padding:1px 5px; border-radius:4px;}
+  .role.r-anim{background:var(--slate-soft); color:var(--slate);}
+  .role.r-conseil{background:var(--accent-soft); color:var(--accent-ink);}
+  .role.r-metier{background:var(--warm-soft); color:var(--warm);}
+  .msg .when{font-family:var(--mono); font-size:10px; color:var(--ink-3);}
+  .msg .pinflag{font-family:var(--mono); font-size:9.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--warm);}
+  .msg .txt{margin-top:2px; max-width:68ch; overflow-wrap:anywhere;}
+  .mention{background:var(--accent-soft); color:var(--accent-ink); border-radius:4px; padding:0 3px; font-weight:600;}
+  .msg .from{font-family:var(--mono); font-size:9.5px; color:var(--ink-3); margin-top:3px;}
+  .reacts{display:flex; gap:5px; flex-wrap:wrap; margin-top:7px; align-items:center;}
+  .react{
+    display:inline-flex; align-items:center; gap:5px; padding:2px 8px; border-radius:999px;
+    border:1px solid var(--line-2); background:var(--surface); font-size:12.5px; line-height:1.5;
+  }
+  .react .n{font-family:var(--mono); font-size:10.5px; color:var(--ink-2);}
+  .react[aria-pressed="true"]{background:var(--accent-soft); border-color:var(--accent); color:var(--accent-ink);}
+  .react[aria-pressed="true"] .n{color:var(--accent-ink);}
+  .react.add{color:var(--ink-3); font-size:13px; padding:2px 9px;}
+  .picker{display:flex; gap:4px; padding:3px 5px; border:1px solid var(--line-2); border-radius:999px; background:var(--surface);}
+  .picker button{background:transparent; border:0; font-size:15px; line-height:1; padding:2px 3px; border-radius:6px;}
+  .picker button:hover{background:var(--surface-2);}
+  .thread{margin-top:8px; border-left:2px solid var(--line-2); padding-left:12px; display:grid; gap:9px;}
+  .thr{display:grid; grid-template-columns:24px minmax(0,1fr); gap:9px; font-size:14px;}
+  .thr .head{display:flex; gap:7px; align-items:baseline; flex-wrap:wrap;}
+  .thr .who{font-weight:600; font-size:13.5px;}
+  .link-btn{background:transparent; border:0; padding:3px 0; font-size:12.5px; font-weight:600; color:var(--ink-3);}
+  .link-btn:hover{color:var(--ink);}
+  .typing{padding:2px 28px 8px; font-size:12.5px; color:var(--ink-3); font-style:italic; min-height:26px;}
+
+  /* ====================== composer ====================== */
+  .composer{padding:0 18px 16px;}
+  .composer form{background:var(--surface); border:1px solid var(--line); border-radius:11px; padding:10px 13px; display:grid; gap:7px;}
+  .composer textarea{width:100%; min-height:40px; max-height:180px; resize:vertical; border:0; background:transparent; font:inherit; color:inherit; outline:none;}
+  .composer .row{display:flex; align-items:center; gap:10px; justify-content:space-between; flex-wrap:wrap;}
+  .hint{font-size:12px; color:var(--ink-3);}
+  .btn{background:var(--accent); color:var(--on-accent); border:1px solid var(--accent); padding:6px 14px; border-radius:8px; font-size:13.5px; font-weight:600;}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+  .btn.ghost{background:transparent; color:var(--ink-2); border-color:var(--line-2);}
+  .btn.ghost[aria-pressed="true"]{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent);}
+  .btn.sm{padding:4px 10px; font-size:12.5px;}
+  .btn.warn{background:var(--alert); border-color:var(--alert); color:#fff;}
+
+  /* ====================== vocal : scène ====================== */
+  .vstage{padding:16px 18px 20px; display:grid; gap:14px; align-content:start;}
+  .vnote{
+    display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:start;
+    background:var(--warm-soft); border:1px solid color-mix(in srgb, var(--warm) 30%, transparent);
+    border-radius:10px; padding:11px 13px; font-size:13px;
+  }
+  .vnote b{font-family:var(--mono); font-size:9.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--warm);}
+  .tiles{display:grid; gap:11px; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+  .tile{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 12px 13px;
+    display:grid; justify-items:center; gap:8px; text-align:center;
+  }
+  .tile .ring{border-radius:50%; padding:3px; border:2px solid transparent; transition:border-color .12s, box-shadow .12s;}
+  .tile.parle .ring{border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft);}
+  .tile .avatar{width:52px; height:52px; font-size:16px;}
+  .tile .nm{font-size:13.5px; font-weight:700; line-height:1.2;}
+  .tile .st{font-family:var(--mono); font-size:9.5px; color:var(--ink-3);}
+  .tile .st.off{color:var(--alert);}
+  .screen{background:#000; border:1px solid var(--line); border-radius:12px; overflow:hidden; position:relative;}
+  .screen video{display:block; width:100%; max-height:46vh; background:#000;}
+  .screen .cap{position:absolute; left:10px; top:10px; font-family:var(--mono); font-size:10px; background:rgba(0,0,0,.65); color:#fff; padding:3px 7px; border-radius:5px;}
+  .vjoin{display:flex; gap:9px; flex-wrap:wrap; align-items:center;}
+
+  /* ====================== bibliothèque / agenda ====================== */
+  .grid{display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); padding:14px 18px 18px;}
+  .prod{background:var(--surface); border:1px solid var(--line); border-radius:11px; padding:14px; display:grid; gap:7px; align-content:start;}
+  .prod h4{font-size:15.5px; font-family:var(--body); font-weight:700; line-height:1.35;}
+  .prod .by{font-size:12.5px; color:var(--ink-2);}
+  .prod .foot{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:3px; font-family:var(--mono); font-size:10.5px; color:var(--ink-3);}
+  .pill{font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; padding:3px 7px; border-radius:5px; background:var(--surface-2); color:var(--ink-2); justify-self:start; white-space:nowrap;}
+  .pill.conseil{background:var(--accent-soft); color:var(--accent-ink);}
+  .pill.metier{background:var(--warm-soft); color:var(--warm);}
+  .pill.trans{background:var(--slate-soft); color:var(--slate);}
+
+  .agenda{display:grid; gap:11px; padding:14px 18px 18px;}
+  .ev{display:grid; grid-template-columns:58px minmax(0,1fr) auto; gap:14px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:11px; padding:13px 15px;}
+  @media (max-width:560px){ .ev{grid-template-columns:50px minmax(0,1fr);} .ev .cta{grid-column:2; justify-self:start;} }
+  .ev .date{text-align:center; border-right:1px solid var(--line); padding-right:12px;}
+  .ev .date .d{font-family:var(--display); font-size:22px; font-weight:800; line-height:1;}
+  .ev .date .m{font-family:var(--mono); font-size:10px; text-transform:uppercase; color:var(--ink-3);}
+  .ev h4{font-size:15.5px; font-family:var(--body); font-weight:700;}
+  .ev .det{font-size:12.5px; color:var(--ink-2); margin-top:2px;}
+  .ev .bar{height:4px; border-radius:2px; background:var(--surface-2); margin-top:7px; overflow:hidden; max-width:220px;}
+  .ev .bar i{display:block; height:100%; background:var(--accent); border-radius:2px;}
+  .ev .bar i.full{background:var(--warm);}
+  .ev .cta{display:grid; gap:6px; justify-items:stretch;}
+
+  .empty{margin:24px 18px; background:var(--surface); border:1px dashed var(--line-2); border-radius:12px; padding:28px 22px; text-align:center;}
+  .empty h3{font-size:17px; margin-bottom:6px;}
+  .empty p{color:var(--ink-2); max-width:46ch; margin:0 auto 14px;}
+
+  /* ====================== membres ====================== */
+  .avatar{
+    width:34px; height:34px; flex:none; border-radius:50%; display:grid; place-items:center;
+    font-family:var(--mono); font-size:11.5px; font-weight:500;
+    background:var(--accent-soft); color:var(--accent-ink); position:relative;
+  }
+  .avatar.sm{width:24px; height:24px; font-size:9.5px;}
+  .avatar.metier{background:var(--warm-soft); color:var(--warm);}
+  .avatar.anim{background:var(--slate-soft); color:var(--slate);}
+  .avatar[data-st]::after{
+    content:''; position:absolute; right:-1px; bottom:-1px; width:10px; height:10px; border-radius:50%;
+    border:2px solid var(--surface); background:var(--ink-3);
+  }
+  .avatar[data-st="en-ligne"]::after{background:var(--accent);}
+  .avatar[data-st="occupe"]::after{background:var(--alert);}
+  .avatar[data-st="absent"]::after{background:var(--warm);}
+  .people h3{font-family:var(--body); font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3); margin:16px 0 8px;}
+  .people h3:first-child{margin-top:0;}
+  .prow{display:grid; grid-template-columns:auto minmax(0,1fr); gap:9px; align-items:center; padding:5px 4px; border-radius:8px;}
+  .prow:hover{background:var(--surface-2);}
+  .prow .nm{font-size:13.5px; font-weight:600; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .prow .jb{font-size:11.5px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .segsm{display:flex; gap:5px; margin-bottom:6px;}
+  .segsm button{flex:1; padding:4px 6px; font-size:11.5px; font-weight:600; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink-2);}
+  .segsm button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--ground);}
+  .side-card{background:var(--ground); border:1px solid var(--line); border-radius:10px; padding:11px 12px; margin-top:16px;}
+  .side-card .k{font-family:var(--mono); font-size:9.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3);}
+  .side-card .t{font-size:13.5px; font-weight:700; line-height:1.25; margin:3px 0 2px;}
+  .side-card .s{font-size:12px; color:var(--ink-3);}
+
+  .demo-strip{font-size:11.5px; color:var(--ink-3); padding:9px 18px 18px; border-top:1px solid var(--line);}
+  .demo-strip b{font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--warm);}
+
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="col spaces" id="spaces" aria-label="Espaces"></nav>
+
+  <div class="col chans">
+    <div class="chans-head">
+      <div class="k" id="espace-k">Espace</div>
+      <h2 id="espace-nom">Le Réseau</h2>
+    </div>
+    <div class="chans-body" id="salons"></div>
+    <div class="voicebar" id="voicebar"></div>
+  </div>
+
+  <main class="stage" id="stage"></main>
+
+  <aside class="col people" id="people" aria-label="Membres"></aside>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ========================================================== données */
+var REGIONS = [
+  {id:'aura', court:'AURA', ini:'AR', nom:'Auvergne-Rhône-Alpes'},
+  {id:'occitanie', court:'Occitanie', ini:'OC', nom:'Occitanie'},
+  {id:'bretagne', court:'Bretagne', ini:'BZ', nom:'Bretagne'},
+  {id:'idf', court:'Île-de-France', ini:'IDF', nom:'Île-de-France'},
+  {id:'hdf', court:'Hauts-de-France', ini:'HDF', nom:'Hauts-de-France'}
+];
+var ROLES = {anim:'Animation', conseil:'Conseil', metier:'Métier'};
+
+var MEMBRES = [
+  {id:'lb', nom:'Lionel B.', ini:'LB', job:'Animation nationale', region:'aura', role:'anim', st:'en-ligne'},
+  {id:'sk', nom:'Salomé Kerbrat', ini:'SK', job:'Consultante indépendante', region:'bretagne', role:'conseil', st:'en-ligne'},
+  {id:'mv', nom:'Marc Vaillant', ini:'MV', job:'Kinésithérapeute du sport', region:'aura', role:'metier', st:'en-ligne'},
+  {id:'nb', nom:'Nadia Belkacem', ini:'NB', job:'Formatrice, CCI Hérault', region:'occitanie', role:'conseil', st:'en-ligne'},
+  {id:'tr', nom:'Thomas Ruiz', ini:'TR', job:"Chef d'atelier, menuiserie", region:'occitanie', role:'metier', st:'en-ligne'},
+  {id:'ef', nom:'Élodie Fauré', ini:'EF', job:'Conseil RH', region:'idf', role:'conseil', st:'occupe'},
+  {id:'ks', nom:'Karim Sellami', ini:'KS', job:'Agence immobilière', region:'hdf', role:'metier', st:'absent'},
+  {id:'ap', nom:'Anne-Laure Pichon', ini:'AP', job:"Cabinet d'expertise-comptable", region:'aura', role:'conseil', st:'en-ligne'},
+  {id:'jm', nom:'Jules Marceau', ini:'JM', job:'Coordinateur de club sportif', region:'bretagne', role:'metier', st:'absent'},
+  {id:'vo', nom:'Véronique Ott', ini:'VO', job:'Développement économique', region:'hdf', role:'conseil', st:'hors-ligne'},
+  {id:'pd', nom:'Pierre Dagnaud', ini:'PD', job:'Responsable logistique', region:'idf', role:'metier', st:'en-ligne'},
+  {id:'fl', nom:'Farida Lemoine', ini:'FL', job:'Maraîchère', region:'aura', role:'metier', st:'absent'},
+  {id:'hb', nom:'Hugo Brenier', ini:'HB', job:'Agence de communication', region:'occitanie', role:'conseil', st:'en-ligne'},
+  {id:'cs', nom:'Camille Sorin', ini:'CS', job:'Juriste', region:'bretagne', role:'conseil', st:'hors-ligne'}
+];
+var M = {}; MEMBRES.forEach(function(m){ M[m.id] = m; });
+var MOI = 'lb';
+
+var ESPACES = [{id:'national', ini:'RN', nom:'Le Réseau', k:'National · 142 membres'}];
+REGIONS.forEach(function(r){ ESPACES.push({id:r.id, ini:r.ini, nom:r.court, k:r.nom, region:r.id}); });
+var E = {}; ESPACES.forEach(function(e){ E[e.id] = e; });
+
+var SALONS = [
+  {id:'nat-annonces', e:'national', nom:'annonces', mode:'fil', sujet:"Ce qui concerne tout le monde. On n'y répond pas, on y réagit."},
+  {id:'nat-conseils', e:'national', nom:'conseils', mode:'fil', sujet:"Une question avec son contexte trouve réponse en moins de 48 h."},
+  {id:'nat-productions', e:'national', nom:'productions', mode:'biblio', sujet:"Ce qui a déjà servi, avec ce que ça ne couvre pas."},
+  {id:'nat-agenda', e:'national', nom:'agenda', mode:'agenda', sujet:"Les dates du réseau, visio et présentiel."},
+  {id:'v-amphi', e:'national', nom:'Grand amphi', mode:'vocal', cap:100, sujet:"Les visios nationales. Micro fermé par défaut."},
+  {id:'v-cafe', e:'national', nom:'Café du réseau', mode:'vocal', cap:12, sujet:"Ouvert en permanence. On entre, on parle, on repart."},
+  {id:'v-aide', e:'national', nom:"Bureau d'aide", mode:'vocal', cap:6, sujet:"Un problème précis, quelqu'un qui décroche."}
+];
+REGIONS.forEach(function(r){
+  SALONS.push(
+    {id:r.id+'-accueil', e:r.id, nom:'accueil', mode:'fil', sujet:'Le point de départ de '+r.nom+'.'},
+    {id:r.id+'-conseillers', e:r.id, nom:'conseillers', mode:'fil', sujet:'Missions, tarifs, appels d’offres, co-animations.'},
+    {id:r.id+'-metier', e:r.id, nom:'mon-métier', mode:'fil', sujet:'Ce qui a marché sur de vrais dossiers, et ce qui a raté.'},
+    {id:r.id+'-productions', e:r.id, nom:'productions', mode:'biblio', sujet:'La bibliothèque de '+r.court+'.'},
+    {id:'v-'+r.id+'-perm', e:r.id, nom:'Permanence', mode:'vocal', cap:10, sujet:'Le mardi de 12 h à 14 h, et dès que quelqu’un y entre.'},
+    {id:'v-'+r.id+'-atelier', e:r.id, nom:'Atelier', mode:'vocal', cap:8, sujet:'Pour travailler à deux ou trois sur un dossier.'}
+  );
+});
+var S = {}; SALONS.forEach(function(s){ S[s.id] = s; });
+
+/* qui est dans quel salon vocal (démo) */
+var VOCAUX = {
+  'v-cafe':['nb','tr','hb'],
+  'v-aide':['ap'],
+  'v-amphi':[],
+  'v-aura-perm':['mv','fl'],
+  'v-aura-atelier':[],
+  'v-occitanie-perm':[], 'v-occitanie-atelier':['tr'],
+  'v-bretagne-perm':['sk'], 'v-bretagne-atelier':[],
+  'v-idf-perm':[], 'v-idf-atelier':[],
+  'v-hdf-perm':[], 'v-hdf-atelier':[]
+};
+
+var MSG = [
+  {id:'m1', s:'nat-annonces', a:'lb', t:'09:12', pin:true, r:[{e:'👍',n:34},{e:'🙌',n:12}], rep:[],
+   txt:"Le calendrier d'octobre est ouvert : deux visios nationales et trois rendez-vous en région. L'atelier chiffrage de Toulouse est déjà complet, une seconde date sera posée en novembre si la liste d'attente dépasse dix personnes."},
+  {id:'m2', s:'nat-annonces', a:'lb', t:'hier 17:40', r:[{e:'✅',n:19}], rep:[],
+   txt:"Règle de dépôt dans #productions : chaque fichier indique sur quel cas réel il a servi et ce qu'il ne couvre pas. Une trame sans contexte d'usage ne se réutilise pas, elle se re-fabrique."},
+  {id:'m3', s:'nat-conseils', a:'tr', t:'14:03', r:[{e:'👍',n:13},{e:'🤔',n:3}],
+   txt:"Comment vous facturez la mise en place quand le client n'a aucun fichier exploitable ? Chez mon dernier, j'ai passé deux jours à remettre au propre un export avant de pouvoir faire quoi que ce soit.",
+   rep:[{a:'ap', t:'14:21', txt:"Ligne séparée « remise en état des données », au forfait, annoncée avant. Sinon ça mange toute la marge."},
+        {a:'nb', t:'14:26', txt:"Et tu la fais chiffrer par le client : quand il voit le prix, il retrouve souvent un export propre."},
+        {a:'hb', t:'15:02', txt:"Moi je la mets en prérequis. Pas de données propres, pas de démarrage."}]},
+  {id:'m4', s:'nat-conseils', a:'jm', t:'11:47', r:[{e:'👍',n:5}],
+   txt:"Mon association veut acheter 12 licences. Usages légers : courriers, comptes rendus, quelques affiches. Est-ce que ça vaut le coup ou on reste sur 3 comptes partagés le temps de voir ?",
+   rep:[{a:'pd', t:'12:10', txt:"3 comptes partagés c'est une mauvaise idée dès qu'il y a des données d'adhérents. Séparez au moins les rôles."},
+        {a:'vo', t:'12:31', txt:"Commencez par 4 licences sur les 4 personnes qui écrivent vraiment. Vous verrez en trois mois."}]},
+  {id:'m5', s:'nat-conseils', a:'ef', t:'hier 09:05', pin:true, r:[{e:'✅',n:22},{e:'🔥',n:6}], rep:[],
+   txt:"Rappel du salon : une question qui donne le contexte, le résultat obtenu et le résultat attendu reçoit une réponse en quelques heures. Les questions en une ligne restent sans réponse — ce n'est pas de la mauvaise volonté, c'est qu'on ne peut rien en faire."},
+  {id:'m6', s:'aura-accueil', a:'lb', t:'lundi 08:30', pin:true, r:[{e:'🙌',n:9}], rep:[],
+   txt:"Restitution AURA le 9 octobre à Grenoble, 14 h – 18 h. Condition d'entrée : arriver avec un cas réel, chiffré, y compris s'il a échoué. Les démos d'outil, on les garde pour les salons professionnels."},
+  {id:'m7', s:'aura-conseillers', a:'ap', t:'10:15', r:[{e:'🔥',n:21},{e:'👍',n:7}],
+   txt:"Première mission de cadrage facturée : cabinet de 9 personnes, 2 jours d'audit + 1 journée d'atelier, 2 400 €. Ce qui a emporté la décision, ce n'est pas la techno, c'est d'avoir chiffré le temps passé aujourd'hui sur leurs relances clients.",
+   rep:[{a:'nb', t:'10:32', txt:"2 400 € pour 3 jours, tu es dans le marché. Ne descends pas."},
+        {a:'hb', t:'10:41', txt:"Tu peux déposer la trame de proposition ? Je pars de zéro sur un dossier similaire."},
+        {a:'sk', t:'11:05', txt:"Ajoute une clause sur l'hébergement des données, j'ai perdu un marché là-dessus."}]},
+  {id:'m8', s:'aura-metier', a:'mv', t:'12:48', r:[{e:'👍',n:14},{e:'✅',n:4}],
+   txt:"Test terminé : j'ai fait rédiger mes 11 comptes rendus de séance de la semaine avec le gabarit de la séance 3. 22 minutes au lieu de 2 h 10. Le point qui coince : les noms des patients, je les remplace par un code avant. Rien d'identifiant ne sort du cabinet.",
+   rep:[{a:'fl', t:'13:02', txt:"Le coup du code, je le reprends pour mes fiches de livraison. Merci."},
+        {a:'ap', t:'13:20', txt:"@Marc tu mets ton gabarit dans #productions ? Deux comptables ici en auraient l'usage direct."}]},
+  {id:'m9', s:'aura-metier', a:'fl', t:'hier 19:22', r:[{e:'🤔',n:6}],
+   txt:"Question sûrement bête : quelqu'un a réussi à obtenir une fiche de traçabilité qui garde les mêmes colonnes d'une fois sur l'autre ? Le mien en invente une nouvelle à chaque relance et je passe plus de temps à corriger qu'à saisir.",
+   rep:[{a:'pd', t:'hier 20:01', txt:"Ne lui demande pas le tableau : donne-lui le tableau vide et demande de le remplir. Ça change tout."},
+        {a:'mv', t:'hier 20:14', txt:"Pareil ici. La structure doit venir de toi, jamais de lui."}]},
+  {id:'m10', s:'occitanie-conseillers', a:'nb', t:'08:55', r:[{e:'👍',n:17}],
+   txt:"Retour d'atelier CCI Montpellier : 18 dirigeants, 3 heures. Ce qui a marché : partir de leur propre devis, pas de l'outil. Ce qui a raté : la démo en direct, le wifi de la salle a tenu quatre minutes. Prévoyez toujours des captures en secours.",
+   rep:[{a:'ef', t:'09:30', txt:"Les captures en secours : règle d'or. Je n'ai plus fait une seule démo live depuis 2024."}]},
+  {id:'m11', s:'occitanie-conseillers', a:'hb', t:'11:20', r:[{e:'🤔',n:9}],
+   txt:"Ordre de grandeur pour une demi-journée de sensibilisation en collectivité ? Je suis à 750 € et j'ai l'impression d'être en dessous de tout le monde.",
+   rep:[{a:'vo', t:'11:44', txt:"En collectivité je suis à 950 € la demi-journée, préparation comprise. Et c'est passé sans négociation."},
+        {a:'nb', t:'11:52', txt:"750 € c'est ton tarif de 2024. Regarde ton temps de préparation réel avant de refaire ton prix."},
+        {a:'ap', t:'12:15', txt:"Le piège c'est la préparation sur mesure non facturée. Moi je la compte en jours."}]},
+  {id:'m12', s:'occitanie-metier', a:'tr', t:'mardi 16:10', r:[{e:'👍',n:12},{e:'🔥',n:3}], rep:[],
+   txt:"Chiffrage de menuiserie : j'ai mis mes tarifs fournisseur dans une feuille et je fais relire chaque devis avant envoi. Trois erreurs de métré rattrapées en deux semaines, dont une à 900 €. Le calcul reste dans le tableur, lui ne fait que relire."},
+  {id:'m13', s:'bretagne-conseillers', a:'sk', t:'hier 15:30', r:[{e:'🔥',n:26},{e:'✅',n:11}],
+   txt:"J'ai perdu un appel d'offres faute d'une mention sur l'hébergement et la conservation des données. Je remets dans #productions la clause que j'utilise depuis, relue par @Camille. Trois lignes, et ça débloque les dossiers publics.",
+   rep:[{a:'cs', t:'hier 16:02', txt:"Précision : la clause vaut pour un traitement sans données de santé. Au-delà, on en reparle."},
+        {a:'vo', t:'08:40', txt:"Reprise telle quelle pour le dossier de la métropole. Merci."}]},
+  {id:'m14', s:'bretagne-metier', a:'jm', t:'07:50', r:[{e:'👍',n:15}], rep:[],
+   txt:"Club de 340 licenciés : les convocations de match partent maintenant en 10 minutes le jeudi soir au lieu d'une heure. Le vrai gain n'est pas la rédaction, c'est de ne plus oublier les arbitres et les voitures."},
+  {id:'m15', s:'idf-conseillers', a:'ef', t:'13:12', r:[{e:'🔥',n:31},{e:'🤔',n:8}],
+   txt:"Alerte utile : sur 6 fiches de poste relues cette semaine, 4 reprenaient des critères discriminants présents dans les modèles fournis par le client. Le texte sort propre et bien tourné, et le problème est dedans. On relit ligne à ligne, toujours.",
+   rep:[{a:'cs', t:'13:40', txt:"Juridiquement c'est l'employeur qui répond, pas l'outil ni le prestataire. À dire au client dès le cadrage."},
+        {a:'ap', t:'14:05', txt:"Ta grille de relecture est déposée ? Je la mets dans mon kit de mission."}]},
+  {id:'m16', s:'idf-metier', a:'pd', t:'mercredi 17:05', r:[{e:'👍',n:18}],
+   txt:"Plans de tournée : j'ai arrêté de lui demander d'optimiser, il se trompe systématiquement de distances. Je lui fais mettre en forme le tableau et je garde mon outil pour le calcul. Depuis, plus une erreur.",
+   rep:[{a:'ks', t:'mercredi 18:11', txt:"Même logique sur les surfaces de bien. Tout ce qui est chiffre vérifiable, je le fournis."}]},
+  {id:'m17', s:'hdf-metier', a:'ks', t:'10:02', r:[{e:'👍',n:11}], rep:[],
+   txt:"40 annonces reprises en trois jours, texte et titre. Le piège : le DPE. Si je ne le colle pas dans le contexte, il en invente un plausible. Vérification systématique avant publication, c'est devenu une étape de ma check-list."},
+  {id:'m18', s:'hdf-conseillers', a:'vo', t:'il y a 2 j', r:[{e:'🙌',n:7}],
+   txt:"Je cherche deux personnes pour co-animer une matinée « IA et TPE » le 14 novembre à Lille. Défraiement prévu, 40 participants attendus, profils artisans et commerçants.",
+   rep:[{a:'sk', t:'il y a 2 j', txt:"Disponible si c'est le matin, je peux prendre l'atelier devis."},
+        {a:'ef', t:'hier', txt:"Intéressée aussi. Tu as le déroulé prévisionnel quelque part ?"}]},
+  {id:'m19', s:'v-cafe', a:'nb', t:'14:31', r:[], rep:[],
+   txt:"On est trois sur le café, on parle tarifs collectivité si quelqu'un veut se joindre."},
+  {id:'m20', s:'v-cafe', a:'hb', t:'14:36', r:[{e:'👍',n:2}], rep:[],
+   txt:"Je partage mon écran deux minutes pour montrer le devis dont je parlais."}
+];
+
+var PRODUCTIONS = [
+  {t:'Clause hébergement et conservation des données', type:'Document', a:'sk', s:'bretagne-productions', n:52, cas:'Deux dossiers publics. Ne couvre pas les données de santé.'},
+  {t:"Grille de relecture d'une fiche de poste", type:'Grille', a:'ef', s:'idf-productions', n:44, cas:'6 fiches relues, 4 corrigées.'},
+  {t:'Barème indicatif de tarifs 2026', type:'Tableur', a:'lb', s:'nat-productions', n:67, cas:'Compilé sur 23 missions déclarées par le réseau.'},
+  {t:'Trame de proposition — cadrage IA en TPE', type:'Document', a:'ap', s:'aura-productions', n:38, cas:'Cabinet comptable de 9 personnes, mission vendue 2 400 €.'},
+  {t:"Déroulé d'atelier 3 h pour dirigeants", type:'Support', a:'nb', s:'occitanie-productions', n:31, cas:'18 participants en CCI. Ne tient pas au-delà de 25.'},
+  {t:'Gabarit de compte rendu de séance', type:'Prompt', a:'mv', s:'aura-productions', n:27, cas:'11 comptes rendus par semaine, données pseudonymisées en amont.'},
+  {t:"Check-list de publication d'annonce", type:'Grille', a:'ks', s:'hdf-productions', n:23, cas:'40 annonces. Le DPE reste à vérifier à la main.'},
+  {t:'Tableur de suivi de tournée', type:'Tableur', a:'pd', s:'idf-productions', n:19, cas:'Calcul des distances fait hors modèle.'},
+  {t:'Convocations de match — modèle', type:'Prompt', a:'jm', s:'bretagne-productions', n:14, cas:'Club de 340 licenciés, envoi du jeudi soir.'}
+];
+
+var EVENTS = [
+  {id:'e1', d:'2', m:'oct', t:'Visio nationale — facturer une mission IA', e:'national', voc:'v-amphi', lieu:'Grand amphi', h:'18 h 30 – 20 h', places:60, inscrits:41},
+  {id:'e2', d:'9', m:'oct', t:'Restitution de promo AURA', e:'aura', voc:null, lieu:'Grenoble, La Coloc', h:'14 h – 18 h', places:25, inscrits:22},
+  {id:'e3', d:'14', m:'oct', t:'Midi-démo — un cas réel, un métier', e:'national', voc:'v-amphi', lieu:'Grand amphi', h:'12 h 30 – 13 h 15', places:100, inscrits:63},
+  {id:'e4', d:'17', m:'oct', t:'Atelier Occitanie — devis et chiffrage', e:'occitanie', voc:null, lieu:'Toulouse, La Cantine', h:'9 h – 12 h 30', places:20, inscrits:20},
+  {id:'e5', d:'21', m:'oct', t:'Visio — données clients, sans juriste sous la main', e:'national', voc:'v-amphi', lieu:'Grand amphi', h:'18 h 30 – 20 h', places:80, inscrits:34},
+  {id:'e6', d:'5', m:'nov', t:'Petit déjeuner des conseillers bretons', e:'bretagne', voc:null, lieu:'Rennes, Le Papier Timbré', h:'8 h 30 – 10 h', places:15, inscrits:9},
+  {id:'e7', d:'14', m:'nov', t:'Matinée IA & TPE', e:'hdf', voc:null, lieu:'Lille, MEL', h:'9 h – 12 h 30', places:40, inscrits:12}
+];
+
+var NONLUS = {'nat-conseils':4, 'nat-annonces':1, 'aura-metier':2, 'occitanie-conseillers':3, 'idf-conseillers':5, 'bretagne-conseillers':2, 'hdf-metier':1};
+var EMOJIS = ['👍','✅','🙌','🤔','🔥','😄'];
+
+/* ========================================================== état */
+var ST = {
+  espace:'national', salon:'nat-annonces', q:'', role:'all',
+  mesReacts:{}, fils:{}, venue:{}, nouveaux:[], draft:{}, picker:null
+};
+try{
+  var sv = localStorage.getItem('maillage.salon');
+  if(sv && S[sv]){ ST.salon = sv; ST.espace = S[sv].e; }
+}catch(e){}
+
+var VOICE = {
+  salon:null, stream:null, ctx:null, analyser:null, data:null, raf:0,
+  muet:false, sourd:false, ptt:false, micro:'aucun', niveau:0, ecran:null, parleur:null, tic:0
+};
+
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function escTexte(s){
+  /* pas d'échappement des apostrophes : sinon &#39; est relu comme un salon #39 */
+  return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; });
+}
+function riche(s){
+  return escTexte(s)
+    .replace(/@([A-ZÉÈÀÎÔ][\wÀ-ÿ'’-]*)/g, '<span class="mention">@$1</span>')
+    .replace(/#([a-zà-ÿ][a-zà-ÿ0-9-]*)/g, '<span class="mention">#$1</span>');
+}
+function av(id, cls){
+  var m = M[id];
+  var c = m.role==='metier' ? ' metier' : (m.role==='anim' ? ' anim' : '');
+  return '<span class="avatar'+(cls?' '+cls:'')+c+'" data-st="'+m.st+'" title="'+esc(m.nom)+'" aria-hidden="true">'+esc(m.ini)+'</span>';
+}
+function salonsDe(eid){ return SALONS.filter(function(s){ return s.e === eid; }); }
+function messagesDe(sid){
+  return MSG.filter(function(m){ return m.s===sid; }).concat(ST.nouveaux.filter(function(m){ return m.s===sid; }));
+}
+function vocauxDe(sid){
+  var l = (VOCAUX[sid] || []).slice();
+  if(VOICE.salon === sid) l = l.concat([MOI]);
+  return l;
+}
+
+/* ========================================================== rendu : espaces */
+function renderEspaces(){
+  var h = '';
+  ESPACES.forEach(function(e, i){
+    var n = salonsDe(e.id).reduce(function(acc,s){ return acc + (NONLUS[s.id]||0); }, 0);
+    h += '<button class="sp" data-espace="'+e.id+'" aria-current="'+(ST.espace===e.id)+'" title="'+esc(e.nom)+'">'
+       + esc(e.ini) + (n ? '<span class="bulle">'+n+'</span>' : '') + '</button>';
+    if(i===0) h += '<div class="sp-sep"></div><div class="sp-lab">Régions</div>';
+  });
+  document.getElementById('spaces').innerHTML = h;
+}
+
+/* ========================================================== rendu : salons */
+function renderSalons(){
+  var e = E[ST.espace];
+  document.getElementById('espace-k').textContent = e.k;
+  document.getElementById('espace-nom').textContent = e.nom;
+
+  var list = salonsDe(ST.espace);
+  var textes = list.filter(function(s){ return s.mode !== 'vocal'; });
+  var vocaux = list.filter(function(s){ return s.mode === 'vocal'; });
+  var h = '<div class="cgroup">Salons textuels</div>';
+
+  textes.forEach(function(s){
+    var n = NONLUS[s.id] || 0;
+    var icone = s.mode==='biblio' ? '▤' : (s.mode==='agenda' ? '▦' : '#');
+    h += '<button class="ch'+(n?' unread':'')+'" data-salon="'+s.id+'" aria-current="'+(ST.salon===s.id)+'">'
+       + '<span class="hash">'+icone+'</span><span class="nm">'+esc(s.nom)+'</span>'
+       + (n ? '<span class="cnt">'+n+'</span>' : '<span></span>') + '</button>';
+  });
+
+  h += '<div class="cgroup">Salons vocaux</div>';
+  vocaux.forEach(function(s){
+    var dedans = vocauxDe(s.id);
+    h += '<button class="ch'+(dedans.length?' live':'')+'" data-salon="'+s.id+'" aria-current="'+(ST.salon===s.id)+'">'
+       + '<span class="hash">🔊</span><span class="nm">'+esc(s.nom)+'</span>'
+       + '<span class="vc">'+(dedans.length ? dedans.length+'/'+s.cap : '')+'</span></button>';
+    if(dedans.length){
+      h += '<div class="vmembers">' + dedans.map(function(id){
+        var parle = (VOICE.salon===s.id && ((id===MOI && VOICE.niveau>12 && !VOICE.muet) || VOICE.parleur===id));
+        return '<span class="vmem"'+(parle?' style="color:var(--accent-ink);font-weight:600"':'')+'>'+av(id,'sm')+esc(M[id].nom)+'</span>';
+      }).join('') + '</div>';
+    }
+  });
+
+  document.getElementById('salons').innerHTML = h;
+  renderVoicebar();
+}
+
+/* ========================================================== rendu : barre vocale */
+function renderVoicebar(){
+  var bar = document.getElementById('voicebar');
+  if(!VOICE.salon){
+    bar.innerHTML = '<div class="state"><span class="led" style="background:var(--ink-3);box-shadow:none"></span>'
+      + '<span class="txt"><b>Hors vocal</b><span>choisissez un salon 🔊</span></span></div>'
+      + '<div class="state" style="gap:9px">' + av(MOI) + '<span class="txt"><b>Lionel B.</b><span>Animation nationale</span></span></div>';
+    return;
+  }
+  var s = S[VOICE.salon];
+  var etat = VOICE.micro==='ok' ? (VOICE.muet ? 'micro coupé' : 'micro ouvert') : (VOICE.micro==='refuse' ? 'écoute seule' : 'autorisation micro\u2026');
+  bar.innerHTML =
+    '<div class="state"><span class="led"></span><span class="txt"><b>'+esc(s.nom)+'</b><span>'+vocauxDe(s.id).length+' connectés · '+etat+'</span></span></div>'
+  + '<div class="meter'+(VOICE.muet?' muet':'')+'" aria-hidden="true"><i id="meter-fill"></i></div>'
+  + '<div class="vtools">'
+  + '<button class="vt" data-v="mic" aria-pressed="'+VOICE.muet+'" title="Micro" aria-label="Couper ou rouvrir le micro">'+(VOICE.muet?'🔇':'🎙')+'</button>'
+  + '<button class="vt" data-v="son" aria-pressed="'+VOICE.sourd+'" title="Son" aria-label="Couper ou rétablir le son">'+(VOICE.sourd?'🔈':'🎧')+'</button>'
+  + '<button class="vt" data-v="ecran" aria-pressed="'+(!!VOICE.ecran)+'" title="Partager l’écran" aria-label="Partager l’écran">🖥</button>'
+  + '<button class="vt quit" data-v="quit" title="Quitter le vocal" aria-label="Quitter le vocal">✕</button>'
+  + '</div>'
+  + '<div class="ptt-hint">'+(VOICE.muet && VOICE.micro==='ok' ? 'Maintenez la barre d’espace pour parler' : 'Espace = couper/parler')+'</div>';
+}
+
+/* ========================================================== rendu : scène */
+function render(){
+  renderEspaces();
+  renderSalons();
+  renderPeople();
+
+  var s = S[ST.salon];
+  var st = document.getElementById('stage');
+  var icone = s.mode==='vocal' ? '🔊' : (s.mode==='biblio' ? '▤' : (s.mode==='agenda' ? '▦' : '#'));
+
+  var h = '<header class="stage-head">'
+    + '<span class="ttl"><h1>'+icone+' '+esc(s.nom)+'</h1>'
+    + '<span class="sujet">'+esc(s.sujet)+'</span></span>'
+    + '<label class="search"><span aria-hidden="true" style="color:var(--ink-3)">⌕</span>'
+    + '<input id="q" type="search" placeholder="Rechercher dans le réseau" value="'+esc(ST.q)+'" autocomplete="off"></label>'
+    + '</header>';
+
+  if(ST.q){ h += vueRecherche(); }
+  else if(s.mode==='vocal'){ h += vueVocal(s); }
+  else if(s.mode==='biblio'){ h += vueBiblio(s); }
+  else if(s.mode==='agenda'){ h += vueAgenda(s); }
+  else { h += vueFil(s); }
+
+  st.innerHTML = h;
+  var fs = st.querySelector('.feed-scroll');
+  if(fs && !ST.q) fs.scrollTop = fs.scrollHeight;
+}
+
+function vueFil(s){
+  var msgs = messagesDe(s.id);
+  var h = '<div class="feed-scroll"><div class="feed">';
+  if(!msgs.length){
+    h += '<div class="empty"><h3>Salon vide</h3><p>Une question ouverte lance mieux un salon qu’une annonce. Racontez un cas en cours, même bancal.</p></div>';
+  } else {
+    h += msgs.map(function(m){ return carte(m, false); }).join('');
+  }
+  h += '</div><div class="typing" id="typing"></div></div>' + composer(s);
+  return h;
+}
+
+function carte(m, avecSalon){
+  var a = M[m.a];
+  var mes = ST.mesReacts[m.id] || {};
+  var reacts = (m.r || []).map(function(r){
+    var actif = !!mes[r.e];
+    return '<button class="react" data-react="'+m.id+'|'+r.e+'" aria-pressed="'+actif+'">'
+         + '<span aria-hidden="true">'+r.e+'</span><span class="n">'+(r.n + (actif?1:0))+'</span></button>';
+  }).join('');
+  Object.keys(mes).forEach(function(e){
+    var connu = (m.r||[]).some(function(r){ return r.e===e; });
+    if(!connu) reacts += '<button class="react" data-react="'+m.id+'|'+e+'" aria-pressed="true"><span aria-hidden="true">'+e+'</span><span class="n">1</span></button>';
+  });
+  if(ST.picker === m.id){
+    reacts += '<span class="picker">' + EMOJIS.map(function(e){
+      return '<button type="button" data-react="'+m.id+'|'+e+'" aria-label="Réagir '+e+'">'+e+'</button>';
+    }).join('') + '</span>';
+  } else {
+    reacts += '<button class="react add" data-picker="'+m.id+'" aria-label="Ajouter une réaction">+</button>';
+  }
+
+  var rep = m.rep || [];
+  var ouvert = !!ST.fils[m.id];
+  var h = '<article class="msg'+(m.pin?' pin':'')+'">' + av(m.a) + '<div>';
+  h += '<div class="head"><span class="who">'+esc(a.nom)+'</span>'
+     + '<span class="role r-'+a.role+'">'+esc(ROLES[a.role])+'</span>'
+     + (m.pin ? '<span class="pinflag">épinglé</span>' : '')
+     + '<span class="when">'+esc(m.t)+'</span></div>';
+  if(avecSalon) h += '<div class="from">'+esc(E[S[m.s].e].nom)+' · '+(S[m.s].mode==='vocal'?'🔊 ':'#')+esc(S[m.s].nom)+'</div>';
+  h += '<p class="txt">'+riche(m.txt)+'</p>';
+  h += '<div class="reacts">'+reacts
+     + (rep.length ? '<button class="link-btn" data-fil="'+m.id+'" style="margin-left:6px">'+(ouvert?'Masquer le fil':rep.length+' réponse'+(rep.length>1?'s':''))+'</button>' : '')
+     + '</div>';
+  if(ouvert && rep.length){
+    h += '<div class="thread">' + rep.map(function(r){
+      return '<div class="thr">'+av(r.a,'sm')+'<div><div class="head"><span class="who">'+esc(M[r.a].nom)+'</span><span class="when">'+esc(r.t)+'</span></div><p>'+riche(r.txt)+'</p></div></div>';
+    }).join('') + '</div>';
+  }
+  h += '</div></article>';
+  return h;
+}
+
+function composer(s){
+  var d = ST.draft[s.id] || '';
+  return '<div class="composer"><form id="composer">'
+    + '<textarea id="draft" rows="1" placeholder="Écrire dans '+(s.mode==='vocal'?'🔊 ':'#')+esc(s.nom)+'…">'+esc(d)+'</textarea>'
+    + '<div class="row"><span class="hint">Entrée pour envoyer · @ pour mentionner quelqu’un</span>'
+    + '<button class="btn" type="submit" id="envoyer"'+(d.trim().length<2?' disabled':'')+'>Envoyer</button></div>'
+    + '</form></div>';
+}
+
+function vueVocal(s){
+  var dedans = vocauxDe(s.id);
+  var ici = VOICE.salon === s.id;
+  var h = '<div class="feed-scroll"><div class="vstage">';
+
+  if(ici && VOICE.micro === 'refuse'){
+    h += '<div class="vnote"><span aria-hidden="true">🔇</span><div><b>Micro refusé</b><br>'
+       + 'Ce navigateur a refusé l’accès au micro : vous restez en écoute. Pour l’ouvrir, autorisez le microphone depuis la barre d’adresse, puis rechargez la page.</div></div>';
+  } else {
+    h += '<div class="vnote"><span aria-hidden="true">🎙</span><div><b>Démo</b><br>'
+       + 'Votre micro est réellement capté par ce navigateur : le vumètre et l’anneau vert suivent votre voix, et « couper » coupe la piste pour de bon. '
+       + 'Rien n’est transmis ni enregistré — les autres participants sont simulés, faute de serveur vocal derrière cette démo.</div></div>';
+  }
+
+  if(!ici){
+    h += '<div class="vjoin"><button class="btn" data-v="join|'+s.id+'">Rejoindre le vocal</button>'
+       + '<span class="hint">'+(dedans.length ? dedans.length+' personne'+(dedans.length>1?'s':'')+' déjà là' : 'Personne pour l’instant')+' · '+s.cap+' places</span></div>';
+  }
+
+  if(VOICE.ecran && ici){
+    h += '<div class="screen"><span class="cap">Votre écran · en direct</span><video id="screen-video" autoplay playsinline muted></video></div>';
+  }
+
+  if(dedans.length){
+    h += '<div class="tiles">' + dedans.map(function(id){
+      var moi = id === MOI;
+      var parle = ici && (moi ? (VOICE.niveau > 12 && !VOICE.muet) : VOICE.parleur === id);
+      var etat = moi
+        ? (VOICE.micro==='ok' ? (VOICE.muet ? 'micro coupé' : 'micro ouvert') : (VOICE.micro==='refuse' ? 'écoute seule' : 'autorisation\u2026'))
+        : 'simulé';
+      return '<div class="tile'+(parle?' parle':'')+'"><span class="ring">'+av(id)+'</span>'
+        + '<span class="nm">'+esc(M[id].nom)+(moi?' (vous)':'')+'</span>'
+        + '<span class="st'+(moi && VOICE.muet ? ' off':'')+'">'+etat+'</span></div>';
+    }).join('') + '</div>';
+  } else {
+    h += '<div class="empty" style="margin:6px 0"><h3>Salon vocal vide</h3><p>'+esc(s.sujet)+'</p></div>';
+  }
+
+  h += '</div></div>';
+  h += '<div style="padding:0 18px"><div style="border-top:1px solid var(--line)"></div></div>';
+  var msgs = messagesDe(s.id);
+  if(msgs.length){
+    h = h.replace('</div></div><div style="padding:0 18px">',
+      '</div><div class="feed">' + msgs.map(function(m){ return carte(m,false); }).join('') + '</div></div><div style="padding:0 18px">');
+  }
+  h += composer(s);
+  return h;
+}
+
+function vueBiblio(s){
+  var list = s.id==='nat-productions' ? PRODUCTIONS.slice() : PRODUCTIONS.filter(function(p){ return p.s === s.id; });
+  var h = '<div class="feed-scroll">';
+  if(!list.length){
+    h += '<div class="empty"><h3>Rien de déposé ici</h3><p>Une production, c’est un fichier qui a déjà servi une fois, avec la mention de ce qu’il ne couvre pas.</p></div>';
+  } else {
+    h += '<div class="grid">' + list.map(function(p){
+      var r = M[p.a].role;
+      return '<article class="prod"><span class="pill '+(r==='anim'?'trans':r)+'">'+esc(p.type)+'</span>'
+        + '<h4>'+esc(p.t)+'</h4>'
+        + '<p class="by">'+esc(M[p.a].nom)+' · '+esc(E[S[p.s].e].nom)+'</p>'
+        + '<p class="hint">'+esc(p.cas)+'</p>'
+        + '<div class="foot"><span>'+p.n+' reprises</span><button class="btn ghost sm" data-copie="1">Reprendre</button></div></article>';
+    }).join('') + '</div>';
+  }
+  h += '</div>' + composer(s);
+  return h;
+}
+
+function vueAgenda(s){
+  var list = EVENTS.slice();
+  var h = '<div class="feed-scroll"><div class="agenda">' + list.map(function(ev){
+    var venu = !!ST.venue[ev.id];
+    var n = ev.inscrits + (venu?1:0);
+    var complet = n >= ev.places;
+    var pct = Math.min(100, Math.round(n/ev.places*100));
+    return '<article class="ev"><div class="date"><div class="d">'+ev.d+'</div><div class="m">'+ev.m+'</div></div>'
+      + '<div><h4>'+esc(ev.t)+'</h4>'
+      + '<p class="det">'+esc(ev.h)+' · '+esc(ev.lieu)+' · '+esc(E[ev.e].nom)+'</p>'
+      + '<div class="bar"><i class="'+(complet?'full':'')+'" style="width:'+pct+'%"></i></div>'
+      + '<p class="hint" style="margin-top:4px">'+n+' / '+ev.places+' places'+(complet?' — complet, liste d’attente ouverte':'')+'</p></div>'
+      + '<div class="cta"><button class="btn '+(venu?'ghost':'')+' sm" data-venue="'+ev.id+'" aria-pressed="'+venu+'">'+(venu?'Inscrit':(complet?'Liste d’attente':'Je participe'))+'</button>'
+      + (ev.voc ? '<button class="btn ghost sm" data-v="join|'+ev.voc+'">Rejoindre 🔊</button>' : '')
+      + '</div></article>';
+  }).join('') + '</div></div>';
+  return h;
+}
+
+function vueRecherche(){
+  var q = ST.q.toLowerCase();
+  var msgs = ST.nouveaux.concat(MSG).filter(function(m){
+    return (m.txt + ' ' + M[m.a].nom).toLowerCase().indexOf(q) > -1;
+  });
+  var prods = PRODUCTIONS.filter(function(p){ return (p.t+' '+p.cas+' '+M[p.a].nom).toLowerCase().indexOf(q) > -1; });
+  var h = '<div class="feed-scroll"><div class="feed">';
+  h += '<p class="hint" style="padding:10px 10px 4px">'+msgs.length+' message'+(msgs.length>1?'s':'')+' et '+prods.length+' production'+(prods.length>1?'s':'')+' pour « '+esc(ST.q)+' », tous espaces confondus.</p>';
+  if(prods.length){
+    h += '</div><div class="grid">' + prods.map(function(p){
+      var r = M[p.a].role;
+      return '<article class="prod"><span class="pill '+(r==='anim'?'trans':r)+'">'+esc(p.type)+'</span><h4>'+esc(p.t)+'</h4>'
+        + '<p class="by">'+esc(M[p.a].nom)+' · '+esc(E[S[p.s].e].nom)+'</p><p class="hint">'+esc(p.cas)+'</p></article>';
+    }).join('') + '</div><div class="feed">';
+  }
+  h += msgs.length ? msgs.map(function(m){ return carte(m, true); }).join('')
+                   : '<div class="empty"><h3>Rien trouvé</h3><p>Essayez un mot du métier : devis, tarif, données, atelier, tournée, DPE.</p></div>';
+  h += '</div></div>';
+  return h;
+}
+
+/* ========================================================== rendu : membres */
+function renderPeople(){
+  var e = E[ST.espace];
+  var list = MEMBRES.filter(function(m){
+    if(e.region && m.region !== e.region && m.id !== MOI) return false;
+    if(ST.role !== 'all' && m.role !== ST.role) return false;
+    return true;
+  });
+  var enligne = list.filter(function(m){ return m.st==='en-ligne' || m.st==='occupe'; });
+  var absents = list.filter(function(m){ return m.st==='absent'; });
+  var off = list.filter(function(m){ return m.st==='hors-ligne'; });
+
+  var h = '<div class="segsm" role="group" aria-label="Filtrer par rôle">'
+    + [['all','Tous'],['conseil','Conseil'],['metier','Métier']].map(function(o){
+        return '<button data-role="'+o[0]+'" aria-pressed="'+(ST.role===o[0])+'">'+o[1]+'</button>';
+      }).join('') + '</div>';
+
+  function bloc(titre, l){
+    if(!l.length) return '';
+    return '<h3>'+titre+' — '+l.length+'</h3>' + l.map(function(m){
+      return '<div class="prow">'+av(m.id)+'<div><div class="nm">'+esc(m.nom)+(m.id===MOI?' · vous':'')+'</div><div class="jb">'+esc(m.job)+'</div></div></div>';
+    }).join('');
+  }
+  h += bloc('En ligne', enligne) + bloc('Absents', absents) + bloc('Hors ligne', off);
+
+  var prochain = EVENTS[0];
+  h += '<div class="side-card"><div class="k">Prochain rendez-vous</div>'
+     + '<div class="t">'+esc(prochain.t)+'</div>'
+     + '<div class="s">'+prochain.d+' '+prochain.m+' · '+esc(prochain.h)+'</div></div>';
+  h += '<div class="side-card"><div class="k">Silence radio</div>'
+     + '<div class="t">Occitanie · #mon-métier</div><div class="s">12 jours sans message</div></div>';
+  h += '<p class="demo-strip" style="border:0;padding:14px 0 0"><b>Démo</b> Membres, messages et productions sont fictifs.</p>';
+
+  document.getElementById('people').innerHTML = h;
+}
+
+/* ========================================================== vocal : moteur */
+function majMetre(){
+  if(!VOICE.analyser){ return; }
+  VOICE.analyser.getByteTimeDomainData(VOICE.data);
+  var somme = 0;
+  for(var i=0;i<VOICE.data.length;i++){ var v = (VOICE.data[i]-128)/128; somme += v*v; }
+  var niveau = Math.min(100, Math.round(Math.sqrt(somme/VOICE.data.length) * 320));
+  var avant = VOICE.niveau > 12;
+  VOICE.niveau = VOICE.muet ? 0 : niveau;
+  var fill = document.getElementById('meter-fill');
+  if(fill) fill.style.width = VOICE.niveau + '%';
+  if((VOICE.niveau > 12) !== avant) majTuiles();
+  VOICE.raf = requestAnimationFrame(majMetre);
+}
+
+function majTuiles(){
+  var tiles = document.querySelectorAll('.tiles .tile');
+  if(!tiles.length) return;
+  var dedans = vocauxDe(VOICE.salon);
+  tiles.forEach(function(t, i){
+    var id = dedans[i];
+    if(!id) return;
+    var parle = id===MOI ? (VOICE.niveau > 12 && !VOICE.muet) : (VOICE.parleur === id);
+    t.classList.toggle('parle', !!parle);
+  });
+  document.querySelectorAll('.vmem').forEach(function(el){ el.removeAttribute('style'); });
+}
+
+function rejoindre(sid){
+  if(VOICE.salon === sid){ return; }
+  if(VOICE.salon) quitter(true);
+  VOICE.salon = sid;
+  VOICE.muet = false; VOICE.sourd = false; VOICE.micro = 'attente';
+  ST.salon = sid; ST.espace = S[sid].e;
+  render();
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    VOICE.micro = 'refuse'; render(); return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true}}).then(function(stream){
+    VOICE.stream = stream;
+    VOICE.micro = 'ok';
+    var AC = window.AudioContext || window.webkitAudioContext;
+    VOICE.ctx = new AC();
+    var src = VOICE.ctx.createMediaStreamSource(stream);
+    VOICE.analyser = VOICE.ctx.createAnalyser();
+    VOICE.analyser.fftSize = 512;
+    VOICE.data = new Uint8Array(VOICE.analyser.fftSize);
+    src.connect(VOICE.analyser);
+    render();
+    VOICE.raf = requestAnimationFrame(majMetre);
+  }).catch(function(){
+    VOICE.micro = 'refuse';
+    render();
+  });
+}
+
+function quitter(silencieux){
+  if(VOICE.raf) cancelAnimationFrame(VOICE.raf);
+  VOICE.raf = 0;
+  if(VOICE.stream) VOICE.stream.getTracks().forEach(function(t){ t.stop(); });
+  if(VOICE.ecran) VOICE.ecran.getTracks().forEach(function(t){ t.stop(); });
+  if(VOICE.ctx && VOICE.ctx.close) { try{ VOICE.ctx.close(); }catch(e){} }
+  VOICE.stream = null; VOICE.ecran = null; VOICE.ctx = null; VOICE.analyser = null;
+  VOICE.salon = null; VOICE.niveau = 0; VOICE.muet = false; VOICE.micro = 'aucun'; VOICE.parleur = null;
+  if(!silencieux) render();
+}
+
+function basculeMicro(force){
+  VOICE.muet = (typeof force === 'boolean') ? force : !VOICE.muet;
+  if(VOICE.stream){
+    VOICE.stream.getAudioTracks().forEach(function(t){ t.enabled = !VOICE.muet; });
+  }
+  if(VOICE.muet) VOICE.niveau = 0;
+  renderVoicebar();
+  majTuiles();
+}
+
+function partagerEcran(){
+  if(VOICE.ecran){
+    VOICE.ecran.getTracks().forEach(function(t){ t.stop(); });
+    VOICE.ecran = null; render(); return;
+  }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia){ signaler("Le partage d’écran n’est pas disponible dans ce navigateur."); return; }
+  navigator.mediaDevices.getDisplayMedia({video:true, audio:false}).then(function(stream){
+    VOICE.ecran = stream;
+    stream.getVideoTracks()[0].addEventListener('ended', function(){ VOICE.ecran = null; render(); });
+    render();
+    var v = document.getElementById('screen-video');
+    if(v){ v.srcObject = stream; }
+  }).catch(function(){ /* annulé par l'utilisateur */ });
+}
+
+function signaler(txt){
+  var t = document.getElementById('typing');
+  if(t){ t.textContent = txt; setTimeout(function(){ if(t) t.textContent=''; }, 4000); }
+}
+
+/* parole simulée des autres participants */
+setInterval(function(){
+  if(!VOICE.salon) return;
+  var autres = (VOCAUX[VOICE.salon] || []);
+  if(!autres.length){ VOICE.parleur = null; return; }
+  var r = Math.random();
+  VOICE.parleur = r < 0.45 ? null : autres[Math.floor(Math.random()*autres.length)];
+  majTuiles();
+  var box = document.getElementById('salons');
+  if(box) renderSalons();
+}, 1400);
+
+/* « est en train d'écrire » : décor de démo, salons textuels seulement */
+setInterval(function(){
+  var t = document.getElementById('typing');
+  if(!t || ST.q) return;
+  var s = S[ST.salon];
+  if(!s || s.mode !== 'fil'){ return; }
+  var candidats = MEMBRES.filter(function(m){ return m.st==='en-ligne' && m.id!==MOI && (!E[s.e].region || m.region===E[s.e].region); });
+  if(!candidats.length) return;
+  if(t.textContent){ t.textContent = ''; return; }
+  if(Math.random() < 0.5){
+    var c = candidats[Math.floor(Math.random()*candidats.length)];
+    t.textContent = c.nom + ' est en train d’écrire…';
+  }
+}, 3800);
+
+/* ========================================================== interactions */
+document.addEventListener('click', function(ev){
+  var el = ev.target.closest('[data-espace],[data-salon],[data-react],[data-picker],[data-fil],[data-venue],[data-role],[data-v],[data-copie]');
+  if(!el) return;
+
+  if(el.dataset.espace){
+    ST.espace = el.dataset.espace;
+    var prem = salonsDe(ST.espace)[0];
+    if(prem){ ST.salon = prem.id; delete NONLUS[prem.id]; }
+    ST.q = ''; ST.picker = null;
+    render(); return;
+  }
+  if(el.dataset.salon){
+    ST.salon = el.dataset.salon;
+    ST.espace = S[ST.salon].e;
+    delete NONLUS[ST.salon];
+    ST.q = ''; ST.picker = null;
+    try{ localStorage.setItem('maillage.salon', ST.salon); }catch(e){}
+    if(S[ST.salon].mode === 'vocal' && VOICE.salon !== ST.salon){ render(); return; }
+    render(); return;
+  }
+  if(el.dataset.react){
+    var p = el.dataset.react.split('|');
+    var mid = p[0], emo = p[1];
+    ST.mesReacts[mid] = ST.mesReacts[mid] || {};
+    if(ST.mesReacts[mid][emo]) delete ST.mesReacts[mid][emo]; else ST.mesReacts[mid][emo] = 1;
+    ST.picker = null;
+    render(); return;
+  }
+  if(el.dataset.picker){ ST.picker = (ST.picker === el.dataset.picker) ? null : el.dataset.picker; render(); return; }
+  if(el.dataset.fil){
+    var f = el.dataset.fil;
+    if(ST.fils[f]) delete ST.fils[f]; else ST.fils[f] = 1;
+    render(); return;
+  }
+  if(el.dataset.venue){
+    var e2 = el.dataset.venue;
+    if(ST.venue[e2]) delete ST.venue[e2]; else ST.venue[e2] = 1;
+    render(); return;
+  }
+  if(el.dataset.role){ ST.role = el.dataset.role; renderPeople(); return; }
+  if(el.dataset.copie){
+    var txt = el.textContent; el.textContent = 'Dans votre bibliothèque';
+    setTimeout(function(){ el.textContent = txt; }, 1600); return;
+  }
+  if(el.dataset.v){
+    var v = el.dataset.v.split('|');
+    if(v[0]==='join'){ rejoindre(v[1]); return; }
+    if(v[0]==='quit'){ quitter(); return; }
+    if(v[0]==='mic'){ basculeMicro(); return; }
+    if(v[0]==='son'){ VOICE.sourd = !VOICE.sourd; renderVoicebar(); return; }
+    if(v[0]==='ecran'){ partagerEcran(); return; }
+  }
+});
+
+document.addEventListener('input', function(ev){
+  if(ev.target.id === 'draft'){
+    ST.draft[ST.salon] = ev.target.value;
+    var b = document.getElementById('envoyer');
+    if(b) b.disabled = ev.target.value.trim().length < 2;
+  }
+  if(ev.target.id === 'q'){
+    ST.q = ev.target.value.trim();
+    var pos = ev.target.selectionStart;
+    render();
+    var q2 = document.getElementById('q');
+    if(q2){ q2.focus(); try{ q2.setSelectionRange(pos,pos); }catch(e){} }
+  }
+});
+
+document.addEventListener('submit', function(ev){
+  if(ev.target.id !== 'composer') return;
+  ev.preventDefault();
+  envoyer();
+});
+
+function envoyer(){
+  var ta = document.getElementById('draft');
+  if(!ta) return;
+  var txt = ta.value.trim();
+  if(txt.length < 2) return;
+  var d = new Date();
+  var hh = ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2);
+  ST.nouveaux.push({id:'n'+Date.now(), s:ST.salon, a:MOI, t:hh, r:[], rep:[], txt:txt});
+  ST.draft[ST.salon] = '';
+  render();
+}
+
+document.addEventListener('keydown', function(ev){
+  var dansChamp = /^(INPUT|TEXTAREA)$/.test(ev.target.tagName);
+  if((ev.key === 'Enter' || ev.key === 'Return') && !ev.shiftKey && ev.target.id === 'draft'){
+    ev.preventDefault(); envoyer(); return;
+  }
+  if(ev.code === 'Space' && !dansChamp && VOICE.salon && VOICE.micro === 'ok'){
+    ev.preventDefault();
+    if(!VOICE.ptt){
+      VOICE.ptt = true;
+      if(VOICE.muet){ VOICE.pttTemporaire = true; basculeMicro(false); }
+      else { VOICE.pttTemporaire = false; basculeMicro(true); }
+    }
+  }
+});
+document.addEventListener('keyup', function(ev){
+  if(ev.code === 'Space' && VOICE.ptt){
+    VOICE.ptt = false;
+    if(VOICE.pttTemporaire) basculeMicro(true);
+  }
+});
+
+render();
+})();
+</script>
+</body>
+</html>
