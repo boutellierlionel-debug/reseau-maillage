@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Le Maillage — réseau de formation IA</title>
-<meta name="description" content="Démo : l'espace d'un réseau de formation à l'IA. Un seul fil, une seule salle, et ce qui attend une réponse en premier.">
+<meta name="description" content="L'espace d'un réseau de formation à l'IA : un fil unique filtrable par région et par profil, une salle pour se parler.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap">
@@ -60,39 +60,70 @@
   a{color:var(--canard);}
   :focus-visible{outline:2px solid var(--canard); outline-offset:3px; border-radius:3px;}
 
-  .enveloppe{max-width:760px; margin:0 auto; padding-inline:20px;}
-  @media (max-width:430px){ .enveloppe{padding-inline:16px;} }
+  /* ---------- bandeau d'état ---------- */
+  .bandeau{
+    background:var(--cuivre-clair); color:var(--cuivre);
+    border-bottom:1px solid color-mix(in srgb, var(--cuivre) 28%, transparent);
+    font-size:13px; line-height:1.45;
+  }
+  .bandeau .dedans{max-width:1120px; margin:0 auto; padding:9px 22px; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;}
+  .bandeau b{font-weight:700; text-transform:uppercase; letter-spacing:.06em; font-size:11.5px;}
 
   /* ---------- en-tête ---------- */
-  .top{border-bottom:1px solid var(--trait); background:var(--papier);}
-  .top-in{display:flex; align-items:center; gap:14px; padding-block:14px;}
+  .top{border-bottom:1px solid var(--trait); background:var(--papier); position:sticky; top:env(safe-area-inset-top,0px); z-index:30;}
+  .top-in{max-width:1120px; margin:0 auto; padding:13px 22px; display:flex; align-items:center; gap:14px;}
   .marque{font-family:var(--titre); font-size:21px; font-weight:600; letter-spacing:-.015em; margin-right:auto;}
   .marque span{color:var(--canard);}
   .jour{font-size:13px; color:var(--encre-3);}
-  @media (max-width:520px){ .jour{display:none;} }
+  @media (max-width:640px){ .jour{display:none;} }
+  .burger{display:none; width:38px; height:38px; border:1px solid var(--trait); border-radius:9px; background:var(--blanc); place-items:center; padding:0;}
 
-  /* ---------- onglets ---------- */
-  .onglets{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--papier); border-bottom:1px solid var(--trait);}
-  .onglets-in{display:flex; overflow-x:auto;}
-  .onglets button{
-    background:none; border:0; padding:13px 2px; margin-right:24px; white-space:nowrap;
-    font-size:15px; font-weight:600; color:var(--encre-3);
-    border-bottom:2px solid transparent; margin-bottom:-1px;
-  }
-  .onglets button:last-child{margin-right:0;}
-  .onglets button[aria-selected="true"]{color:var(--encre); border-bottom-color:var(--canard);}
-  .onglets .compte{
-    display:inline-block; margin-left:6px; min-width:19px; padding:0 6px; border-radius:999px;
-    background:var(--cuivre-clair); color:var(--cuivre); font-size:12px; font-weight:700; line-height:19px; text-align:center;
+  /* ---------- structure ---------- */
+  .cadre{max-width:1120px; margin:0 auto; padding:0 22px; display:grid; grid-template-columns:230px minmax(0,1fr); gap:38px; align-items:start;}
+  @media (max-width:900px){
+    .cadre{grid-template-columns:minmax(0,1fr); gap:0; padding-inline:16px;}
+    .burger{display:grid;}
+    .menu{
+      position:fixed; inset:0; z-index:40; background:var(--papier);
+      padding:20px 22px calc(28px + env(safe-area-inset-bottom,0px));
+      overflow-y:auto; display:none;
+    }
+    .menu.ouvert{display:block;}
+    .menu .fermer{display:grid !important;}
   }
 
-  /* ---------- pages ---------- */
-  main{padding-block:26px 130px;}
-  .chapeau{margin-bottom:28px;}
-  .sur-titre{font-size:12.5px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--encre-3); margin-bottom:7px;}
+  /* ---------- menu ---------- */
+  .menu{position:sticky; top:calc(env(safe-area-inset-top,0px) + 74px); padding-block:26px 40px;}
+  .menu .fermer{display:none; width:100%; justify-content:flex-end; margin-bottom:14px;}
+  .m-groupe{margin-bottom:24px;}
+  .m-titre{font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--encre-3); margin-bottom:9px; padding-left:11px;}
+  .m-lien{
+    display:flex; align-items:center; gap:9px; width:100%; text-align:left;
+    background:none; border:0; border-radius:9px; padding:7px 11px;
+    font-size:15px; color:var(--encre-2); line-height:1.35;
+  }
+  .m-lien:hover{background:var(--voile);}
+  .m-lien[aria-current="true"]{background:var(--blanc); color:var(--encre); font-weight:600; box-shadow:var(--ombre);}
+  .m-lien .n{margin-left:auto; font-size:12.5px; color:var(--encre-3); font-variant-numeric:tabular-nums;}
+  .m-lien[aria-current="true"] .n{color:var(--canard);}
+  .m-lien.region{font-size:14.5px; padding-block:6px;}
+  .m-lien .pastille{width:7px; height:7px; border-radius:50%; flex:none; background:var(--trait-fort);}
+  .m-lien.region[aria-current="true"] .pastille{background:var(--canard);}
+  .m-lien.profil .pastille.c{background:var(--canard);}
+  .m-lien.profil .pastille.m{background:var(--cuivre);}
+  .menu .moi{display:flex; align-items:center; gap:10px; padding:11px; border-top:1px solid var(--trait); margin-top:6px;}
+  .menu .moi .nom{font-size:14px; font-weight:600; line-height:1.25;}
+  .menu .moi .role{font-size:12.5px; color:var(--encre-3);}
+
+  /* ---------- contenu ---------- */
+  .page{padding-block:30px 130px; max-width:680px;}
+  .chapeau{margin-bottom:30px;}
+  .sur-titre{font-size:12.5px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--encre-3); margin-bottom:8px;}
   h1{font-size:31px;}
   @media (max-width:430px){ h1{font-size:26px;} }
   .chapeau p{color:var(--encre-2); margin-top:10px; max-width:58ch;}
+  .cadrage{font-size:13.5px; color:var(--encre-3); margin-top:12px;}
+  .cadrage b{color:var(--encre-2); font-weight:600;}
 
   section + section{margin-top:36px;}
   .titre-section{display:flex; align-items:baseline; gap:10px; margin-bottom:14px; padding-bottom:9px; border-bottom:1px solid var(--trait);}
@@ -103,7 +134,7 @@
   .b{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
     background:var(--canard); color:var(--sur-canard); border:1px solid var(--canard);
-    padding:9px 17px; border-radius:9px; font-size:15px; font-weight:600; text-decoration:none;
+    padding:9px 17px; border-radius:9px; font-size:15px; font-weight:600;
   }
   .b:hover{filter:brightness(1.08);}
   .b:disabled{opacity:.45; cursor:not-allowed;}
@@ -111,11 +142,10 @@
   .b.creux:hover{border-color:var(--encre-2); filter:none;}
   .b.chaud{background:var(--cuivre); border-color:var(--cuivre); color:#fff;}
   .b.petit{padding:6px 12px; font-size:14px; border-radius:8px;}
-  .b svg{flex:none;}
   .lien{background:none; border:0; padding:4px 0; font-size:14px; font-weight:600; color:var(--canard); text-decoration:underline; text-underline-offset:3px;}
   .lien:hover{color:var(--encre);}
 
-  /* ---------- la salle ---------- */
+  /* ---------- salle ---------- */
   .salle{
     display:grid; grid-template-columns:auto 1fr auto; gap:16px; align-items:center;
     background:var(--blanc); border:1px solid var(--trait); border-radius:14px; padding:16px 18px; box-shadow:var(--ombre);
@@ -132,30 +162,22 @@
   @keyframes onde{0%,100%{height:6px}50%{height:24px}}
   .onde.dort i{background:var(--encre-3); opacity:.45;}
 
-  /* ---------- attentes ---------- */
-  .attente{display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:start; padding:15px 0; border-bottom:1px solid var(--trait);}
-  .attente:last-child{border-bottom:0;}
-  @media (max-width:560px){ .attente{grid-template-columns:auto 1fr;} .attente .b{grid-column:2; justify-self:start;} }
-  .attente .q{font-size:15.5px; line-height:1.45;}
-  .attente .meta{font-size:13px; color:var(--encre-3); margin-top:4px;}
-  .age{color:var(--cuivre); font-weight:600;}
-
   /* ---------- écrire ---------- */
   .ecrire{background:var(--blanc); border:1px solid var(--trait); border-radius:14px; padding:14px 16px; box-shadow:var(--ombre);}
   .ecrire .choix{display:flex; gap:7px; margin-bottom:11px; flex-wrap:wrap;}
-  .ecrire textarea{width:100%; min-height:58px; resize:vertical; border:0; background:transparent; font:inherit; color:inherit; outline:none; line-height:1.55;}
+  .ecrire textarea{width:100%; min-height:62px; resize:vertical; border:0; background:transparent; font:inherit; color:inherit; outline:none; line-height:1.55;}
   .ecrire textarea::placeholder{color:var(--encre-3);}
   .ecrire .bas{display:flex; align-items:center; gap:12px; justify-content:space-between; flex-wrap:wrap; margin-top:10px; padding-top:11px; border-top:1px solid var(--trait);}
   .conseil{font-size:13px; color:var(--encre-3); max-width:44ch;}
 
-  /* ---------- filtres ---------- */
-  .filtres{display:flex; gap:7px; flex-wrap:wrap; margin:24px 0 2px;}
-  .puce{
-    background:var(--blanc); border:1px solid var(--trait); color:var(--encre-2);
-    padding:5px 13px; border-radius:999px; font-size:14px; font-weight:500;
+  /* ---------- filtres actifs ---------- */
+  .actifs{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:22px 0 4px; font-size:13.5px; color:var(--encre-3);}
+  .jeton{
+    display:inline-flex; align-items:center; gap:7px;
+    background:var(--blanc); border:1px solid var(--trait); border-radius:999px; padding:4px 7px 4px 12px; font-size:13.5px; color:var(--encre);
   }
-  .puce[aria-pressed="true"]{background:var(--encre); border-color:var(--encre); color:var(--papier);}
-  .puce .n{font-variant-numeric:tabular-nums; opacity:.6; margin-left:5px;}
+  .jeton button{background:none; border:0; padding:0 3px; color:var(--encre-3); font-size:15px; line-height:1;}
+  .jeton button:hover{color:var(--cuivre);}
 
   /* ---------- fil ---------- */
   .mot{padding:22px 0; border-bottom:1px solid var(--trait);}
@@ -175,55 +197,46 @@
   .rep .nom{font-weight:600; font-size:14.5px;}
   .rep .quand{font-size:12.5px; color:var(--encre-3);}
   .rep .corps{font-size:15.5px; margin-top:2px; line-height:1.55;}
-  .rep.retenue{background:var(--pousse-clair); border-radius:10px; padding:13px 15px; margin-left:-15px;}
-  .retenue-flag{font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--pousse); display:block; margin-bottom:4px;}
   .repondre{margin-top:15px; display:grid; gap:9px;}
   .repondre textarea{width:100%; min-height:66px; border:1px solid var(--trait); border-radius:10px; background:var(--blanc); font:inherit; color:inherit; padding:11px 13px; outline:none; resize:vertical;}
   .repondre textarea:focus{border-color:var(--canard);}
   .repondre .bas{display:flex; gap:12px; align-items:center;}
 
   /* ---------- pastille ---------- */
-  .past{
-    width:38px; height:38px; flex:none; border-radius:50%; display:grid; place-items:center;
-    font-size:13px; font-weight:700; background:var(--voile); color:var(--encre-2);
-  }
+  .past{width:38px; height:38px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:13px; font-weight:700; background:var(--voile); color:var(--encre-2);}
   .past.pt{width:28px; height:28px; font-size:11px;}
   .past.c{background:var(--canard-clair); color:var(--canard);}
   .past.m{background:var(--cuivre-clair); color:var(--cuivre);}
   .past.a{background:var(--pousse-clair); color:var(--pousse);}
 
-  /* ---------- ressources ---------- */
-  .cherche{display:flex; align-items:center; gap:10px; background:var(--blanc); border:1px solid var(--trait); border-radius:11px; padding:10px 14px; margin-bottom:8px;}
+  /* ---------- listes vides ---------- */
+  .vide{padding:34px 24px; text-align:center; border:1px dashed var(--trait-fort); border-radius:13px; color:var(--encre-2); background:var(--blanc);}
+  .vide h3{font-size:18.5px; margin-bottom:7px; color:var(--encre);}
+  .vide p{max-width:46ch; margin:0 auto 16px; font-size:15px;}
+  .vide .mini{font-size:13px; color:var(--encre-3); margin-top:12px;}
+
+  /* ---------- ressources / dates ---------- */
+  .cherche{display:flex; align-items:center; gap:10px; background:var(--blanc); border:1px solid var(--trait); border-radius:11px; padding:10px 14px; margin-bottom:18px;}
   .cherche input{border:0; background:transparent; font:inherit; color:inherit; width:100%; outline:none; min-width:0;}
   .res{display:grid; grid-template-columns:auto 1fr auto; gap:15px; align-items:center; padding:17px 0; border-bottom:1px solid var(--trait);}
   @media (max-width:560px){ .res{grid-template-columns:auto 1fr;} .res .b{grid-column:2; justify-self:start;} }
-  .res .type{
-    width:46px; height:46px; border-radius:11px; display:grid; place-items:center;
-    background:var(--voile); color:var(--encre-2); font-size:11px; font-weight:700; text-transform:uppercase;
-  }
+  .res .type{width:46px; height:46px; border-radius:11px; display:grid; place-items:center; background:var(--voile); color:var(--encre-2); font-size:11px; font-weight:700; text-transform:uppercase;}
   .res h3{font-family:var(--texte); font-size:16px; font-weight:700; line-height:1.35;}
   .res .par{font-size:13.5px; color:var(--encre-2); margin-top:3px;}
-  .res .sert{font-size:13px; color:var(--encre-3); margin-top:3px;}
 
-  /* ---------- dates ---------- */
   .date-l{display:grid; grid-template-columns:76px 1fr auto; gap:18px; align-items:center; padding:18px 0; border-bottom:1px solid var(--trait);}
-  @media (max-width:560px){ .date-l{grid-template-columns:58px 1fr;} .date-l .cta{grid-column:2; justify-self:start; display:flex; gap:8px; flex-wrap:wrap;} }
+  @media (max-width:560px){ .date-l{grid-template-columns:58px 1fr;} .date-l .cta{grid-column:2; justify-self:start;} }
   .date-l .cal{text-align:center;}
   .date-l .cal .j{font-family:var(--titre); font-size:30px; font-weight:600; line-height:1;}
   .date-l .cal .m{font-size:12px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--encre-3); margin-top:2px;}
   .date-l h3{font-family:var(--texte); font-size:16.5px; font-weight:700;}
   .date-l .ou{font-size:13.5px; color:var(--encre-2); margin-top:3px;}
-  .date-l .places{font-size:13px; color:var(--encre-3); margin-top:5px;}
-  .jauge{height:3px; background:var(--voile); border-radius:2px; max-width:180px; margin-top:7px; overflow:hidden;}
-  .jauge i{display:block; height:100%; background:var(--canard);}
-  .jauge i.plein{background:var(--cuivre);}
-  .dans{font-size:13px; font-weight:600; color:var(--canard);}
 
   /* ---------- barre flottante ---------- */
   .dock{
     position:fixed; left:50%; transform:translateX(-50%);
     bottom:calc(16px + env(safe-area-inset-bottom,0px));
-    width:min(700px, calc(100% - 32px)); z-index:40;
+    width:min(680px, calc(100% - 32px)); z-index:45;
     background:var(--encre); color:var(--papier);
     border-radius:15px; padding:11px 13px;
     display:grid; grid-template-columns:auto 1fr auto; gap:13px; align-items:center;
@@ -232,51 +245,47 @@
   .dock .titre{font-size:14.5px; font-weight:700; line-height:1.25;}
   .dock .sous{font-size:12.5px; opacity:.72; line-height:1.3;}
   .dock .outils{display:flex; gap:7px;}
-  .dock .o{
-    width:40px; height:40px; border-radius:11px; border:1px solid rgba(255,255,255,.22);
-    background:rgba(255,255,255,.08); color:var(--papier); display:grid; place-items:center; padding:0;
-  }
+  .dock .o{width:40px; height:40px; border-radius:11px; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.08); color:var(--papier); display:grid; place-items:center; padding:0;}
   .dock .o:hover{background:rgba(255,255,255,.16);}
   .dock .o[aria-pressed="true"]{background:var(--cuivre); border-color:var(--cuivre); color:#fff;}
   .dock .o.sortir{background:transparent;}
   .vu{display:flex; align-items:flex-end; gap:2.5px; height:22px; width:36px;}
   .vu i{width:3px; background:var(--pousse); border-radius:2px; height:3px; transition:height .08s linear;}
   .vu.coupe i{background:var(--cuivre);}
-  @media (max-width:560px){
-    .dock{grid-template-columns:1fr auto; gap:10px; padding:10px 12px;}
-    .dock .vu{display:none;}
-    .dock .o{width:38px; height:38px;}
-  }
+  @media (max-width:560px){ .dock{grid-template-columns:1fr auto; gap:10px;} .dock .vu{display:none;} .dock .o{width:38px; height:38px;} }
 
   .ecran{margin-top:16px; border-radius:13px; overflow:hidden; background:#000; border:1px solid var(--trait); position:relative;}
   .ecran video{display:block; width:100%; max-height:44vh; background:#000;}
   .ecran .lg{position:absolute; top:10px; left:10px; background:rgba(0,0,0,.66); color:#fff; font-size:12px; padding:3px 9px; border-radius:6px;}
 
-  .vide{padding:34px 22px; text-align:center; border:1px dashed var(--trait-fort); border-radius:13px; color:var(--encre-2);}
-  .vide h3{font-size:18px; margin-bottom:6px; color:var(--encre);}
-  .vide p{max-width:44ch; margin:0 auto 14px; font-size:15px;}
-
-  .pied{border-top:1px solid var(--trait); margin-top:42px; padding-top:18px; font-size:13px; color:var(--encre-3); max-width:60ch;}
-  .pied b{color:var(--cuivre); font-weight:700;}
+  .pied{border-top:1px solid var(--trait); margin-top:44px; padding-top:18px; font-size:13px; color:var(--encre-3); max-width:60ch;}
 
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
 </style>
 </head>
 <body>
 
+<div class="bandeau">
+  <div class="dedans">
+    <b>Maquette</b>
+    <span>Ce que vous écrivez reste dans cet onglet : rien n'est envoyé, partagé, ni conservé après un rechargement. Il manque la partie serveur.</span>
+  </div>
+</div>
+
 <header class="top">
-  <div class="enveloppe top-in">
+  <div class="top-in">
     <span class="marque">Le M<span>ai</span>llage</span>
     <span class="jour" id="jour"></span>
-    <span class="past c" title="Lionel Boutellier">LB</span>
+    <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
   </div>
 </header>
 
-<nav class="onglets">
-  <div class="enveloppe onglets-in" id="onglets" role="tablist"></div>
-</nav>
-
-<main class="enveloppe" id="vue"></main>
+<div class="cadre">
+  <nav class="menu" id="menu" aria-label="Navigation"></nav>
+  <main class="page" id="page"></main>
+</div>
 
 <div id="dock"></div>
 
@@ -284,212 +293,217 @@
 (function(){
 "use strict";
 
-/* ===================================================== données (fictives) */
-var MOI = 'lb';
+/* ============================================================
+   L'espace est vide : il n'y a aucun message, aucune ressource
+   et aucune date. Seules restent les structures — les régions,
+   les deux profils, et la personne connectée.
+   ============================================================ */
 
-var GENS = [
-  {id:'lb', nom:'Lionel Boutellier', ini:'LB', metier:'Animation du réseau', region:'Auvergne-Rhône-Alpes', voie:'anim'},
-  {id:'mv', nom:'Marc Vaillant', ini:'MV', metier:'Kinésithérapeute du sport', region:'Auvergne-Rhône-Alpes', voie:'metier'},
-  {id:'ap', nom:'Anne-Laure Pichon', ini:'AP', metier:'Expertise-comptable', region:'Auvergne-Rhône-Alpes', voie:'conseil'},
-  {id:'fl', nom:'Farida Lemoine', ini:'FL', metier:'Maraîchère', region:'Auvergne-Rhône-Alpes', voie:'metier'},
-  {id:'nb', nom:'Nadia Belkacem', ini:'NB', metier:'Formatrice en CCI', region:'Occitanie', voie:'conseil'},
-  {id:'tr', nom:'Thomas Ruiz', ini:'TR', metier:'Atelier de menuiserie', region:'Occitanie', voie:'metier'},
-  {id:'hb', nom:'Hugo Brenier', ini:'HB', metier:'Agence de communication', region:'Occitanie', voie:'conseil'},
-  {id:'sk', nom:'Salomé Kerbrat', ini:'SK', metier:'Consultante indépendante', region:'Bretagne', voie:'conseil'},
-  {id:'jm', nom:'Jules Marceau', ini:'JM', metier:'Club sportif', region:'Bretagne', voie:'metier'},
-  {id:'cs', nom:'Camille Sorin', ini:'CS', metier:'Juriste', region:'Bretagne', voie:'conseil'},
-  {id:'ef', nom:'Élodie Fauré', ini:'EF', metier:'Conseil RH', region:'Île-de-France', voie:'conseil'},
-  {id:'pd', nom:'Pierre Dagnaud', ini:'PD', metier:'Logistique', region:'Île-de-France', voie:'metier'},
-  {id:'ks', nom:'Karim Sellami', ini:'KS', metier:'Agence immobilière', region:'Hauts-de-France', voie:'metier'},
-  {id:'vo', nom:'Véronique Ott', ini:'VO', metier:'Développement économique', region:'Hauts-de-France', voie:'conseil'}
+var MOI = {id:'moi', nom:'Lionel Boutellier', ini:'LB', metier:'Animation du réseau', region:'aura', profil:'anim'};
+var GENS = {}; GENS[MOI.id] = MOI;
+
+var REGIONS = [
+  {id:'aura', nom:'Auvergne-Rhône-Alpes'},
+  {id:'bfc', nom:'Bourgogne-Franche-Comté'},
+  {id:'bretagne', nom:'Bretagne'},
+  {id:'cvl', nom:'Centre-Val de Loire'},
+  {id:'corse', nom:'Corse'},
+  {id:'grandest', nom:'Grand Est'},
+  {id:'hdf', nom:'Hauts-de-France'},
+  {id:'idf', nom:'Île-de-France'},
+  {id:'normandie', nom:'Normandie'},
+  {id:'na', nom:'Nouvelle-Aquitaine'},
+  {id:'occitanie', nom:'Occitanie'},
+  {id:'pdl', nom:'Pays de la Loire'},
+  {id:'paca', nom:"Provence-Alpes-Côte d'Azur"},
+  {id:'om', nom:'Outre-mer'}
 ];
-var G = {}; GENS.forEach(function(p){ G[p.id] = p; });
+var R = {}; REGIONS.forEach(function(r){ R[r.id] = r; });
 
-var FIL = [
-  {id:'f1', qui:'fl', type:'question', h:5,
-   txt:"Je n'arrive pas à obtenir une fiche de traçabilité qui garde les mêmes colonnes d'une semaine sur l'autre. Il en invente une nouvelle à chaque fois, et je passe plus de temps à corriger qu'à saisir. Quelqu'un a trouvé la parade ?",
-   rep:[]},
-  {id:'f2', qui:'hb', type:'question', h:27,
-   txt:"Quel ordre de grandeur pour une demi-journée de sensibilisation en collectivité ? Je suis à 750 € et j'ai l'impression d'être en dessous de tout le monde.",
-   rep:[]},
-  {id:'f3', qui:'mv', type:'partage', h:3,
-   txt:"Test terminé : 11 comptes rendus de séance rédigés en 22 minutes, contre 2 h 10 avant. Le point qui coince, ce sont les noms des patients — je les remplace par un code avant, rien d'identifiant ne sort du cabinet.",
-   rep:[{qui:'ap', h:2, txt:"Le coup du code, je le reprends pour mes dossiers clients. Simple, et ça règle la question."}]},
-  {id:'f4', qui:'tr', type:'question', h:51, retenue:0,
-   txt:"Comment vous facturez la mise en place quand le client n'a aucun fichier exploitable ? Chez mon dernier, j'ai passé deux jours à remettre au propre un export avant de pouvoir commencer.",
-   rep:[{qui:'ap', h:49, txt:"Une ligne séparée « remise en état des données », au forfait, annoncée avant de démarrer. Sinon ça mange toute la marge, à chaque fois."},
-        {qui:'nb', h:48, txt:"Et fais-la chiffrer par le client : quand il voit le prix, il retrouve souvent un export propre au fond d'un tiroir."}]},
-  {id:'f5', qui:'ef', type:'partage', h:9,
-   txt:"Sur 6 fiches de poste relues cette semaine, 4 reprenaient des critères discriminants présents dans les modèles du client. Le texte sort propre, bien tourné, et le problème est dedans. On relit ligne à ligne, toujours.",
-   rep:[{qui:'cs', h:8, txt:"Juridiquement c'est l'employeur qui répond, pas l'outil ni le prestataire. À dire au client dès le cadrage."}]},
-  {id:'f6', qui:'sk', type:'partage', h:30,
-   txt:"J'ai perdu un appel d'offres faute d'une mention sur l'hébergement et la conservation des données. La clause que j'utilise depuis est dans les ressources, relue par Camille. Trois lignes, et ça débloque les dossiers publics.",
-   rep:[{qui:'vo', h:26, txt:"Reprise telle quelle pour le dossier de la métropole. Merci."}]},
-  {id:'f7', qui:'jm', type:'question', h:75, retenue:1,
-   txt:"Mon association veut acheter 12 licences pour des usages légers : courriers, comptes rendus, quelques affiches. Est-ce que ça vaut le coup, ou on reste sur 3 comptes partagés le temps de voir ?",
-   rep:[{qui:'pd', h:73, txt:"Trois comptes partagés, c'est non dès qu'il y a des données d'adhérents dedans."},
-        {qui:'vo', h:70, txt:"Commencez par 4 licences, sur les 4 personnes qui écrivent vraiment. En trois mois vous saurez qui en a l'usage, et vous ajusterez."}]},
-  {id:'f8', qui:'ks', type:'partage', h:33,
-   txt:"40 annonces reprises en trois jours. Le piège, c'est le DPE : si je ne le colle pas dans le contexte, il en invente un plausible. Vérification avant publication, c'est devenu une étape de ma check-list.",
-   rep:[]},
-  {id:'f9', qui:'nb', type:'partage', h:54,
-   txt:"Retour d'atelier, 18 dirigeants, 3 heures. Ce qui a marché : partir de leur propre devis, pas de l'outil. Ce qui a raté : la démo en direct, le wifi de la salle a tenu quatre minutes. Prévoyez toujours des captures d'écran en secours.",
-   rep:[{qui:'ef', h:52, txt:"Les captures en secours : règle d'or. Plus une seule démo en direct depuis 2024."}]}
+var PROFILS = [
+  {id:'conseil', nom:'Conseillers IA', court:'conseillers', c:'c'},
+  {id:'metier', nom:"L'IA dans mon métier", court:'praticiens', c:'m'}
 ];
+var P = {}; PROFILS.forEach(function(p){ P[p.id] = p; });
 
-var RESSOURCES = [
-  {t:"Clause hébergement et conservation des données", type:'Doc', qui:'sk', n:52, sert:"Deux dossiers publics. Ne couvre pas les données de santé."},
-  {t:"Grille de relecture d'une fiche de poste", type:'Grille', qui:'ef', n:44, sert:"6 fiches relues, 4 corrigées."},
-  {t:"Barème indicatif de tarifs 2026", type:'Tabl.', qui:'lb', n:67, sert:"Compilé sur 23 missions déclarées par le réseau."},
-  {t:"Trame de proposition pour un cadrage en TPE", type:'Doc', qui:'ap', n:38, sert:"Cabinet de 9 personnes, mission vendue 2 400 €."},
-  {t:"Déroulé d'atelier de 3 heures", type:'Support', qui:'nb', n:31, sert:"18 participants. Ne tient pas au-delà de 25."},
-  {t:"Gabarit de compte rendu de séance", type:'Modèle', qui:'mv', n:27, sert:"11 comptes rendus par semaine, noms remplacés en amont."},
-  {t:"Check-list avant publication d'une annonce", type:'Grille', qui:'ks', n:23, sert:"40 annonces. Le DPE reste à vérifier à la main."},
-  {t:"Tableur de suivi de tournée", type:'Tabl.', qui:'pd', n:19, sert:"Le calcul des distances reste hors modèle."},
-  {t:"Modèle de convocation de match", type:'Modèle', qui:'jm', n:14, sert:"Club de 340 licenciés, envoi du jeudi soir."}
-];
-
-var DATES = [
-  {id:'d1', iso:'2026-10-02', t:"Facturer une mission : combien, et comment le dire", ou:"En visio, dans la salle", h:"18 h 30 – 20 h", places:60, inscrits:41, visio:true},
-  {id:'d2', iso:'2026-10-09', t:"Restitution de promo Auvergne-Rhône-Alpes", ou:"Grenoble, La Coloc", h:"14 h – 18 h", places:25, inscrits:22, visio:false},
-  {id:'d3', iso:'2026-10-14', t:"Midi-démo : un cas réel, un métier", ou:"En visio, dans la salle", h:"12 h 30 – 13 h 15", places:100, inscrits:63, visio:true},
-  {id:'d4', iso:'2026-10-17', t:"Atelier devis et chiffrage", ou:"Toulouse, La Cantine", h:"9 h – 12 h 30", places:20, inscrits:20, visio:false},
-  {id:'d5', iso:'2026-10-21', t:"Données clients, sans juriste sous la main", ou:"En visio, dans la salle", h:"18 h 30 – 20 h", places:80, inscrits:34, visio:true},
-  {id:'d6', iso:'2026-11-05', t:"Petit déjeuner des conseillers bretons", ou:"Rennes, Le Papier Timbré", h:"8 h 30 – 10 h", places:15, inscrits:9, visio:false},
-  {id:'d7', iso:'2026-11-14', t:"Matinée IA & TPE", ou:"Lille, MEL", h:"9 h – 12 h 30", places:40, inscrits:12, visio:false}
-];
-
-var DANS_LA_SALLE = ['mv','fl','nb'];
+/* Tout part vide. Ce que vous écrivez vient s'ajouter ici, le temps de l'onglet. */
+var FIL = [];
+var RESSOURCES = [];
+var DATES = [];
+var DANS_LA_SALLE = [];
 
 /* ===================================================== état */
 var ET = {
-  vue:'aujourdhui', filtre:'tout', cherche:'', type:'question',
-  brouillon:'', repond:null, deplie:{}, utiles:{}, inscrit:{}, nouveaux:[]
+  vue:'aujourdhui', region:'toutes', profil:'tous',
+  type:'question', brouillon:'', repond:null, cherche:'',
+  utiles:{}, menuOuvert:false
 };
 var VOIX = {dedans:false, flux:null, ctx:null, analyseur:null, tampon:null, raf:0,
             coupe:false, micro:'aucun', niveau:0, ecran:null, ptt:false, pttTemp:false};
 
 function ech(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-function past(id, taille){
-  var p = G[id];
-  var v = p.voie === 'conseil' ? 'c' : (p.voie === 'metier' ? 'm' : 'a');
-  return '<span class="past ' + v + (taille ? ' ' + taille : '') + '" title="' + ech(p.nom) + '">' + ech(p.ini) + '</span>';
+function qui(id){ return GENS[id] || MOI; }
+function past(id, t){
+  var p = qui(id);
+  var v = p.profil === 'conseil' ? 'c' : (p.profil === 'metier' ? 'm' : 'a');
+  return '<span class="past ' + v + (t ? ' ' + t : '') + '" title="' + ech(p.nom) + '">' + ech(p.ini) + '</span>';
 }
-function depuis(h){
-  if(h < 1) return "à l'instant";
-  if(h < 24) return 'il y a ' + Math.round(h) + ' h';
+function depuis(t){
+  var m = Math.round((Date.now() - t) / 60000);
+  if(m < 1) return "à l'instant";
+  if(m < 60) return 'il y a ' + m + ' min';
+  var h = Math.round(m / 60);
+  if(h < 24) return 'il y a ' + h + ' h';
   var j = Math.round(h / 24);
   return j === 1 ? 'hier' : 'il y a ' + j + ' jours';
 }
-function joursAvant(iso){
-  var a = new Date(); a.setHours(0,0,0,0);
-  return Math.round((new Date(iso + 'T00:00:00') - a) / 86400000);
+function filtre(liste){
+  return liste.filter(function(x){
+    var p = qui(x.qui);
+    if(ET.region !== 'toutes' && p.region !== ET.region) return false;
+    if(ET.profil !== 'tous' && p.profil !== ET.profil) return false;
+    return true;
+  });
 }
-function moisCourt(iso){
-  return new Date(iso + 'T00:00:00').toLocaleDateString('fr-FR', {month:'short'}).replace('.','');
-}
-function dansCombien(j){
-  return j < 0 ? 'passée' : (j === 0 ? "aujourd'hui" : (j === 1 ? 'demain' : 'dans ' + j + ' jours'));
-}
-function tousLesMots(){ return ET.nouveaux.concat(FIL); }
 function sansReponse(){
-  return tousLesMots().filter(function(m){ return m.type === 'question' && !(m.rep && m.rep.length); });
+  return filtre(FIL).filter(function(m){ return m.type === 'question' && !m.rep.length; });
 }
-function nbDansLaSalle(){ return DANS_LA_SALLE.length + (VOIX.dedans ? 1 : 0); }
+function nbSalle(){ return DANS_LA_SALLE.length + (VOIX.dedans ? 1 : 0); }
+function cadreCourant(){
+  var bouts = [];
+  bouts.push(ET.region === 'toutes' ? 'Toutes les régions' : R[ET.region].nom);
+  if(ET.profil !== 'tous') bouts.push(P[ET.profil].nom);
+  return bouts.join(' · ');
+}
 
-/* ===================================================== onglets */
+/* ===================================================== menu */
 var VUES = [
   {id:'aujourdhui', nom:"Aujourd'hui"},
   {id:'echanges', nom:'Échanges'},
   {id:'ressources', nom:'Ressources'},
   {id:'dates', nom:'Dates'}
 ];
-function rendreOnglets(){
+
+function rendreMenu(){
   var n = sansReponse().length;
-  document.getElementById('onglets').innerHTML = VUES.map(function(v){
-    var badge = (v.id === 'echanges' && n) ? '<span class="compte">' + n + '</span>' : '';
-    return '<button role="tab" data-vue="' + v.id + '" aria-selected="' + (ET.vue === v.id) + '">' + v.nom + badge + '</button>';
-  }).join('');
+  var h = '<button class="b creux petit fermer" data-menu="fermer">Fermer</button>';
+
+  h += '<div class="m-groupe"><div class="m-titre">L’espace</div>'
+    + VUES.map(function(v){
+        var marque = '';
+        if(v.id === 'echanges' && n) marque = '<span class="n">' + n + '</span>';
+        if(v.id === 'ressources' && RESSOURCES.length) marque = '<span class="n">' + RESSOURCES.length + '</span>';
+        if(v.id === 'dates' && DATES.length) marque = '<span class="n">' + DATES.length + '</span>';
+        return '<button class="m-lien" data-vue="' + v.id + '" aria-current="' + (ET.vue === v.id) + '">'
+          + v.nom + marque + '</button>';
+      }).join('') + '</div>';
+
+  h += '<div class="m-groupe"><div class="m-titre">Régions</div>'
+    + '<button class="m-lien region" data-region="toutes" aria-current="' + (ET.region === 'toutes') + '">'
+    + '<span class="pastille"></span>Toutes les régions</button>'
+    + REGIONS.map(function(r){
+        var nb = FIL.filter(function(m){ return qui(m.qui).region === r.id; }).length;
+        return '<button class="m-lien region" data-region="' + r.id + '" aria-current="' + (ET.region === r.id) + '">'
+          + '<span class="pastille"></span>' + ech(r.nom)
+          + (nb ? '<span class="n">' + nb + '</span>' : '') + '</button>';
+      }).join('') + '</div>';
+
+  h += '<div class="m-groupe"><div class="m-titre">Profil</div>'
+    + '<button class="m-lien profil" data-profil="tous" aria-current="' + (ET.profil === 'tous') + '">'
+    + '<span class="pastille"></span>Les deux</button>'
+    + PROFILS.map(function(p){
+        var nb = FIL.filter(function(m){ return qui(m.qui).profil === p.id; }).length;
+        return '<button class="m-lien profil" data-profil="' + p.id + '" aria-current="' + (ET.profil === p.id) + '">'
+          + '<span class="pastille ' + p.c + '"></span>' + ech(p.nom)
+          + (nb ? '<span class="n">' + nb + '</span>' : '') + '</button>';
+      }).join('') + '</div>';
+
+  h += '<div class="moi">' + past(MOI.id) + '<div><div class="nom">' + ech(MOI.nom) + '</div>'
+    + '<div class="role">' + ech(MOI.metier) + '</div></div></div>';
+
+  var menu = document.getElementById('menu');
+  menu.innerHTML = h;
+  menu.classList.toggle('ouvert', ET.menuOuvert);
+  document.getElementById('burger').setAttribute('aria-expanded', String(ET.menuOuvert));
 }
 
 /* ===================================================== aujourd'hui */
 function vueAujourdhui(){
-  var attentes = sansReponse().sort(function(a,b){ return b.h - a.h; });
-  var prochaine = DATES.slice().sort(function(a,b){ return joursAvant(a.iso) - joursAvant(b.iso); })[0];
-  var j = joursAvant(prochaine.iso);
-  var dedans = nbDansLaSalle();
+  var attentes = sansReponse();
+  var messages = filtre(FIL);
+  var dedans = nbSalle();
 
-  var bouts = [];
-  if(attentes.length) bouts.push(attentes.length + (attentes.length > 1 ? ' questions attendent' : ' question attend'));
-  if(dedans) bouts.push(dedans + (dedans > 1 ? ' personnes sont dans la salle' : ' personne est dans la salle'));
-  bouts.push('une session ' + dansCombien(j));
-  var titre = bouts.join(', ');
-  titre = titre.charAt(0).toUpperCase() + titre.slice(1);
+  var titre, chapeau;
+  if(!FIL.length && !RESSOURCES.length && !DATES.length){
+    titre = "L'espace est prêt, il n'attend que vous";
+    chapeau = "Rien n'a encore été écrit. Le premier message donne le ton du groupe : "
+            + "une question précise appelle des questions précises, une annonce appelle le silence.";
+  } else {
+    var bouts = [];
+    if(attentes.length) bouts.push(attentes.length + (attentes.length > 1 ? ' questions attendent' : ' question attend'));
+    if(dedans) bouts.push(dedans + (dedans > 1 ? ' personnes sont dans la salle' : ' personne est dans la salle'));
+    if(DATES.length) bouts.push(DATES.length + (DATES.length > 1 ? ' dates à venir' : ' date à venir'));
+    if(!bouts.length) bouts.push(messages.length + (messages.length > 1 ? ' messages dans le fil' : ' message dans le fil'));
+    titre = bouts.join(', ');
+    titre = titre.charAt(0).toUpperCase() + titre.slice(1);
+    chapeau = "Un fil pour les questions et les retours, une salle pour se parler. "
+            + "La région et le profil, à gauche, filtrent ce que vous voyez sans rien cloisonner.";
+  }
 
   var h = '<div class="chapeau"><div class="sur-titre">Votre point du jour</div>'
-    + '<h1>' + ech(titre) + '</h1>'
-    + '<p>Tout se passe au même endroit : un fil pour les questions et les retours, une salle pour se parler. '
-    + 'La région et le métier ne sont pas des portes à pousser, seulement des filtres.</p></div>';
+    + '<h1>' + ech(titre) + '</h1><p>' + ech(chapeau) + '</p>'
+    + '<p class="cadrage">Vous regardez : <b>' + ech(cadreCourant()) + '</b></p></div>';
 
   h += '<section><div class="titre-section"><h2>La salle</h2><span class="note">toujours ouverte</span></div>'
      + carteSalle() + '</section>';
 
-  h += '<section><div class="titre-section"><h2>Sans réponse</h2><span class="note">'
-     + (attentes.length ? 'la plus ancienne remonte à ' + depuis(attentes[0].h).replace('il y a ', '') : 'rien en attente')
-     + '</span></div>';
+  h += '<section><div class="titre-section"><h2>Sans réponse</h2></div>';
   if(!attentes.length){
-    h += '<div class="vide"><h3>Tout le monde a eu une réponse</h3>'
-       + '<p>C’est rare. Profitez-en pour partager un retour, même court.</p>'
-       + '<button class="b creux" data-aller="echanges">Aller au fil</button></div>';
+    h += '<div class="vide"><h3>Aucune question en attente</h3>'
+       + '<p>Les questions posées dans le fil apparaissent ici tant que personne n’y a répondu, avec le temps écoulé.</p>'
+       + '<button class="b" data-vue="echanges">Poser la première question</button></div>';
   } else {
     h += attentes.slice(0, 3).map(function(m){
-      return '<div class="attente">' + past(m.qui)
-        + '<div><div class="q">' + ech(m.txt.slice(0, 112)) + (m.txt.length > 112 ? '…' : '') + '</div>'
-        + '<div class="meta">' + ech(G[m.qui].nom) + ' · ' + ech(G[m.qui].metier)
-        + ' · <span class="age">' + depuis(m.h) + '</span></div></div>'
-        + '<button class="b petit" data-repondre="' + m.id + '">Répondre</button></div>';
+      return '<div class="mot" style="padding-top:0">' + ligneMot(m) + '</div>';
     }).join('');
   }
   h += '</section>';
 
-  h += '<section><div class="titre-section"><h2>Prochaine session</h2>'
-     + '<span class="note dans">' + dansCombien(j) + '</span></div>'
-     + ligneDate(prochaine) + '</section>';
-
-  h += '<section><div class="titre-section"><h2>Ajouté cette semaine</h2><span class="note">par le réseau</span></div>'
-     + RESSOURCES.slice(0, 2).map(ligneRessource).join('')
-     + '<p style="margin-top:15px"><button class="lien" data-aller="ressources">Voir les '
-     + RESSOURCES.length + ' ressources</button></p></section>';
-
-  return h + pied();
+  h += '<section><div class="titre-section"><h2>Prochaine session</h2></div>';
+  h += DATES.length ? ligneDate(DATES[0])
+    : '<div class="vide"><h3>Aucune date posée</h3>'
+      + '<p>Les rendez-vous du groupe s’affichent ici, avec le nombre d’inscrits. Les visios se tiennent dans la salle.</p>'
+      + '<button class="b creux" data-vue="dates">Voir les dates</button></div>';
+  h += '</section>' + pied();
+  return h;
 }
 
 function carteSalle(){
   var dedans = DANS_LA_SALLE.slice();
-  if(VOIX.dedans) dedans.push(MOI);
+  if(VOIX.dedans) dedans.push(MOI.id);
   if(!dedans.length){
     return '<div class="salle"><span class="onde dort"><i></i><i></i><i></i><i></i><i></i></span>'
-      + '<div><div class="qui">Personne pour l’instant</div>'
-      + '<div class="sous">Entrez-y quand même : les autres verront que vous y êtes, et vous rejoindront.</div></div>'
+      + '<div><div class="qui">La salle est vide</div>'
+      + '<div class="sous">Votre micro sera bien capté ; la transmission entre participants reste à brancher.</div></div>'
       + '<button class="b" data-voix="entrer">Ouvrir la salle</button></div>';
   }
-  var noms = dedans.map(function(id){ return id === MOI ? 'vous' : G[id].nom.split(' ')[0]; });
-  var phrase = noms.length === 1 ? noms[0] + ' y est'
+  var noms = dedans.map(function(id){ return id === MOI.id ? 'vous' : qui(id).nom.split(' ')[0]; });
+  var phrase = noms.length === 1 ? noms[0] + (noms[0] === 'vous' ? ' y êtes' : ' y est')
     : noms.slice(0, -1).join(', ') + ' et ' + noms[noms.length - 1] + ' y sont';
   return '<div class="salle active"><span class="onde vit"><i></i><i></i><i></i><i></i><i></i></span>'
     + '<div><div class="qui">' + ech(phrase) + '</div>'
-    + '<div class="sous">' + dedans.map(function(id){ return ech(G[id].metier); }).join(' · ') + '</div></div>'
-    + (VOIX.dedans ? '<button class="b creux" data-voix="sortir">Quitter</button>'
-                   : '<button class="b chaud" data-voix="entrer">Rejoindre</button>') + '</div>';
+    + '<div class="sous">Micro ouvert sur cet appareil. Personne d’autre ne peut encore vous entendre.</div></div>'
+    + '<button class="b creux" data-voix="sortir">Quitter</button></div>';
 }
 
 /* ===================================================== échanges */
 function vueEchanges(){
-  var moi = G[MOI];
+  var liste = filtre(FIL).slice().sort(function(a, b){ return b.t - a.t; });
+
   var h = '<div class="chapeau"><div class="sur-titre">Le fil</div>'
     + '<h1>Une seule liste, pour tout le monde</h1>'
-    + '<p>Pas de salon à choisir avant d’écrire. Vous posez votre question, elle arrive chez ceux que ça concerne, '
-    + 'et elle reste visible tant qu’elle n’a pas de réponse.</p></div>';
+    + '<p>Pas de salon à choisir avant d’écrire. Vous posez votre question, elle reste visible tant qu’elle n’a pas de réponse.</p>'
+    + '<p class="cadrage">Vous écrivez dans : <b>' + ech(cadreCourant()) + '</b></p></div>';
 
   h += '<div class="ecrire"><div class="choix">'
     + '<button class="b petit' + (ET.type === 'question' ? '' : ' creux') + '" data-type="question">Poser une question</button>'
@@ -498,80 +512,60 @@ function vueEchanges(){
         ? 'Votre question, avec ce que vous avez déjà essayé…'
         : 'Ce que vous avez fait, ce que ça a donné, ce qui coince encore…') + '">' + ech(ET.brouillon) + '</textarea>'
     + '<div class="bas"><span class="conseil">' + (ET.type === 'question'
-        ? 'Une question qui donne le contexte et le résultat attendu trouve réponse dans la journée.'
+        ? 'Donnez le contexte et le résultat attendu : c’est ce qui fait venir les réponses.'
         : 'Un chiffre avant / après vaut mieux qu’un avis.') + '</span>'
     + '<button class="b" id="publier"' + (ET.brouillon.trim().length < 3 ? ' disabled' : '') + '>Publier</button></div></div>';
 
-  var filtres = [
-    {id:'tout', nom:'Tout', n:tousLesMots().length},
-    {id:'region', nom:'Ma région', n:tousLesMots().filter(function(m){ return G[m.qui].region === moi.region; }).length},
-    {id:'conseil', nom:'Conseillers', n:tousLesMots().filter(function(m){ return G[m.qui].voie === 'conseil'; }).length},
-    {id:'metier', nom:'Dans mon métier', n:tousLesMots().filter(function(m){ return G[m.qui].voie === 'metier'; }).length},
-    {id:'attente', nom:'Sans réponse', n:sansReponse().length}
-  ];
-  h += '<div class="filtres">' + filtres.map(function(f){
-    return '<button class="puce" data-filtre="' + f.id + '" aria-pressed="' + (ET.filtre === f.id) + '">'
-      + f.nom + '<span class="n">' + f.n + '</span></button>';
-  }).join('') + '</div>';
+  if(ET.region !== 'toutes' || ET.profil !== 'tous'){
+    h += '<div class="actifs"><span>Filtres :</span>'
+      + (ET.region !== 'toutes' ? '<span class="jeton">' + ech(R[ET.region].nom) + '<button data-region="toutes" aria-label="Retirer le filtre de région">×</button></span>' : '')
+      + (ET.profil !== 'tous' ? '<span class="jeton">' + ech(P[ET.profil].nom) + '<button data-profil="tous" aria-label="Retirer le filtre de profil">×</button></span>' : '')
+      + '</div>';
+  }
 
-  var liste = tousLesMots().filter(function(m){
-    if(ET.filtre === 'region') return G[m.qui].region === moi.region;
-    if(ET.filtre === 'conseil' || ET.filtre === 'metier') return G[m.qui].voie === ET.filtre;
-    if(ET.filtre === 'attente') return m.type === 'question' && !(m.rep && m.rep.length);
-    return true;
-  }).sort(function(a, b){ return a.h - b.h; });
-
-  h += liste.length ? liste.map(mot).join('')
-    : '<div class="vide" style="margin-top:24px"><h3>Rien avec ce filtre</h3>'
-      + '<p>Revenez à « Tout » pour voir l’ensemble du réseau.</p>'
-      + '<button class="b creux" data-filtre="tout">Tout afficher</button></div>';
-
+  if(!liste.length){
+    h += '<div class="vide" style="margin-top:24px">'
+      + (FIL.length
+          ? '<h3>Rien dans ce périmètre</h3><p>Aucun message pour ' + ech(cadreCourant().toLowerCase()) + '. Élargissez avec « Toutes les régions ».</p>'
+            + '<button class="b creux" data-region="toutes">Voir tout le réseau</button>'
+          : '<h3>Le fil est vide</h3><p>Aucun message pour l’instant. Le champ ci-dessus attend le premier.</p>'
+            + '<div class="mini">Une question qui dit le contexte, ce qui a été essayé et le résultat attendu reçoit une réponse le jour même. Une question en une ligne reste sans réponse.</div>')
+      + '</div>';
+  } else {
+    h += '<div style="margin-top:8px">' + liste.map(function(m){
+      return '<article class="mot">' + ligneMot(m) + '</article>';
+    }).join('') + '</div>';
+  }
   return h + pied();
 }
 
-function mot(m){
-  var p = G[m.qui];
-  var rep = m.rep || [];
+function ligneMot(m){
+  var p = qui(m.qui);
   var question = m.type === 'question';
-  var resolue = question && rep.length;
-  var ouvert = !!ET.deplie[m.id];
+  var resolue = question && m.rep.length;
   var utile = !!ET.utiles[m.id];
-
   var etiq = question
     ? (resolue ? '<span class="etiq ok">Répondu</span>' : '<span class="etiq q">En attente</span>')
     : '<span class="etiq part">Retour</span>';
 
-  var h = '<article class="mot"><div class="tete">' + past(m.qui)
+  var h = '<div class="tete">' + past(m.qui)
     + '<div><div class="nom">' + ech(p.nom) + '</div>'
-    + '<div class="ident">' + ech(p.metier) + ' · ' + ech(p.region) + '</div></div>'
-    + '<span class="quand">' + etiq + '<br>' + depuis(m.h) + '</span></div>';
+    + '<div class="ident">' + ech(p.metier) + (p.region && R[p.region] ? ' · ' + ech(R[p.region].nom) : '') + '</div></div>'
+    + '<span class="quand">' + etiq + '<br>' + depuis(m.t) + '</span></div>';
 
   h += '<p class="corps' + (question ? ' serif' : '') + '">' + ech(m.txt) + '</p>';
 
   h += '<div class="actions">'
     + '<button class="lien" data-repondre="' + m.id + '">Répondre</button>'
     + '<button class="lien" data-utile="' + m.id + '"' + (utile ? ' style="color:var(--pousse)"' : '') + '>'
-    + (utile ? 'Noté comme utile' : 'Utile') + '</button>';
+    + (utile ? 'Noté comme utile' : 'Utile') + '</button></div>';
 
-  var autres = rep.length - (typeof m.retenue === 'number' ? 1 : 0);
-  if(autres > 0 && typeof m.retenue === 'number'){
-    h += '<button class="lien" data-deplier="' + m.id + '">'
-       + (ouvert ? 'Masquer' : autres + ' autre' + (autres > 1 ? 's' : '') + ' réponse' + (autres > 1 ? 's' : '')) + '</button>';
-  }
-  h += '</div>';
-
-  var visibles = [];
-  if(typeof m.retenue === 'number' && rep[m.retenue]) visibles.push({r:rep[m.retenue], retenue:true});
-  if(typeof m.retenue !== 'number' || ouvert){
-    rep.forEach(function(r, i){ if(i !== m.retenue) visibles.push({r:r, retenue:false}); });
-  }
-  if(visibles.length){
-    h += '<div class="reponses">' + visibles.map(function(v){
-      var a = G[v.r.qui];
-      return '<div class="rep' + (v.retenue ? ' retenue' : '') + '">' + past(v.r.qui, 'pt')
-        + '<div>' + (v.retenue ? '<span class="retenue-flag">La réponse qui a servi</span>' : '')
-        + '<span class="nom">' + ech(a.nom) + '</span> <span class="quand">' + depuis(v.r.h) + '</span>'
-        + '<p class="corps">' + ech(v.r.txt) + '</p></div></div>';
+  if(m.rep.length){
+    h += '<div class="reponses">' + m.rep.map(function(r){
+      return '<div class="rep">' + past(r.qui, 'pt')
+        + '<div><span class="nom">' + ech(qui(r.qui).nom) + '</span> '
+        + '<span class="quand">' + depuis(r.t) + '</span>'
+        + '<p class="corps">' + ech(r.txt) + '</p></div></div>';
     }).join('') + '</div>';
   }
 
@@ -581,68 +575,58 @@ function mot(m){
       + '<div class="bas"><button class="b petit" data-envoyer="' + m.id + '">Envoyer</button>'
       + '<button class="lien" data-annuler="1">Annuler</button></div></div>';
   }
-  return h + '</article>';
+  return h;
 }
 
 /* ===================================================== ressources */
 function vueRessources(){
   var q = ET.cherche.toLowerCase();
   var liste = RESSOURCES.filter(function(r){
-    return !q || (r.t + ' ' + r.sert + ' ' + G[r.qui].nom + ' ' + r.type).toLowerCase().indexOf(q) > -1;
+    return !q || (r.t + ' ' + r.sert).toLowerCase().indexOf(q) > -1;
   });
-  var h = '<div class="chapeau"><div class="sur-titre">Ce que le réseau fabrique</div>'
+  var h = '<div class="chapeau"><div class="sur-titre">Ce que le groupe fabrique</div>'
     + '<h1>Ressources</h1>'
-    + '<p>Chaque fichier dit sur quel cas il a servi, et ce qu’il ne couvre pas. '
-    + 'Sans ça on ne le réutilise pas : on le refait.</p></div>';
-  h += '<div class="cherche">' + loupe()
-    + '<input id="cherche" type="search" placeholder="Chercher : devis, données, tournée…" value="' + ech(ET.cherche) + '"></div>';
+    + '<p>Chaque fichier déposé dit sur quel cas réel il a servi, et ce qu’il ne couvre pas. Sans ça on ne le réutilise pas : on le refait.</p></div>';
+
+  if(RESSOURCES.length){
+    h += '<div class="cherche">' + loupe()
+      + '<input id="cherche" type="search" placeholder="Chercher…" value="' + ech(ET.cherche) + '"></div>';
+  }
   h += liste.length ? liste.map(ligneRessource).join('')
-    : '<div class="vide" style="margin-top:20px"><h3>Rien trouvé</h3>'
-      + '<p>Essayez un mot du métier : devis, tarif, données, atelier, tournée.</p></div>';
+    : '<div class="vide"><h3>Aucune ressource déposée</h3>'
+      + '<p>Une trame, une grille de relecture, un tableur : ce qui a déjà servi une fois à quelqu’un du groupe.</p>'
+      + '<div class="mini">Le dépôt de fichiers demande un espace de stockage — c’est l’une des briques à brancher.</div></div>';
   return h + pied();
 }
 
 function ligneRessource(r){
   return '<div class="res"><span class="type">' + ech(r.type) + '</span>'
-    + '<div><h3>' + ech(r.t) + '</h3>'
-    + '<div class="par">' + ech(G[r.qui].nom) + ' · ' + ech(G[r.qui].region) + '</div>'
-    + '<div class="sert">' + ech(r.sert) + '</div></div>'
-    + '<button class="b creux petit" data-prendre="1">Prendre · ' + r.n + '</button></div>';
+    + '<div><h3>' + ech(r.t) + '</h3><div class="par">' + ech(qui(r.qui).nom) + '</div></div>'
+    + '<button class="b creux petit">Prendre</button></div>';
 }
 
 /* ===================================================== dates */
 function vueDates(){
-  var liste = DATES.slice().sort(function(a, b){ return joursAvant(a.iso) - joursAvant(b.iso); });
   var h = '<div class="chapeau"><div class="sur-titre">Les rendez-vous</div>'
     + '<h1>Dates</h1>'
-    + '<p>Les visios se tiennent dans la salle, la même que celle de l’accueil : '
-    + 'rien d’autre à installer, aucun lien à retrouver.</p></div>';
-  return h + liste.map(ligneDate).join('') + pied();
+    + '<p>Les visios se tiennent dans la salle, la même que celle de l’accueil : aucun lien à retrouver, rien à installer.</p></div>';
+  h += DATES.length ? DATES.map(ligneDate).join('')
+    : '<div class="vide"><h3>Aucune date au calendrier</h3>'
+      + '<p>Sessions, ateliers en région, restitutions de promo : les rendez-vous apparaîtront ici, avec le nombre d’inscrits et les places restantes.</p></div>';
+  return h + pied();
 }
 
 function ligneDate(d){
-  var inscrit = !!ET.inscrit[d.id];
-  var n = d.inscrits + (inscrit ? 1 : 0);
-  var complet = n >= d.places;
-  var j = joursAvant(d.iso);
-  return '<div class="date-l"><div class="cal">'
-    + '<div class="j">' + new Date(d.iso + 'T00:00:00').getDate() + '</div>'
-    + '<div class="m">' + ech(moisCourt(d.iso)) + '</div></div>'
-    + '<div><h3>' + ech(d.t) + '</h3>'
-    + '<div class="ou">' + ech(d.h) + ' · ' + ech(d.ou) + '</div>'
-    + '<div class="jauge"><i class="' + (complet ? 'plein' : '') + '" style="width:'
-    + Math.min(100, Math.round(n / d.places * 100)) + '%"></i></div>'
-    + '<div class="places">' + n + ' inscrits sur ' + d.places
-    + (complet ? ' — complet, liste d’attente ouverte' : '') + '</div></div>'
-    + '<div class="cta"><button class="b' + (inscrit ? ' creux' : '') + ' petit" data-inscrire="' + d.id + '" aria-pressed="' + inscrit + '">'
-    + (inscrit ? 'Inscrit' : (complet ? "Liste d'attente" : 'Je viens')) + '</button>'
-    + (d.visio && j <= 14 && j >= 0 ? '<button class="b creux petit" data-voix="entrer">Salle</button>' : '')
-    + '</div></div>';
+  var date = new Date(d.iso + 'T00:00:00');
+  return '<div class="date-l"><div class="cal"><div class="j">' + date.getDate() + '</div>'
+    + '<div class="m">' + date.toLocaleDateString('fr-FR', {month:'short'}).replace('.','') + '</div></div>'
+    + '<div><h3>' + ech(d.t) + '</h3><div class="ou">' + ech(d.ou) + '</div></div>'
+    + '<div class="cta"><button class="b petit">Je viens</button></div></div>';
 }
 
 function pied(){
-  return '<p class="pied"><b>Démo</b> — membres, messages, ressources et dates sont fictifs. '
-    + 'Le micro de la salle, lui, fonctionne vraiment : il n’y a simplement personne au bout.</p>';
+  return '<p class="pied">Espace vierge : aucun membre, aucun message, aucune ressource. '
+    + 'La structure — régions, profils, salle — attend d’être reliée à une base de données partagée.</p>';
 }
 function loupe(){
   return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--encre-3);flex:none" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>';
@@ -662,11 +646,11 @@ function rendreDock(){
   var dock = document.getElementById('dock');
   if(!VOIX.dedans){ dock.innerHTML = ''; return; }
   var etat = VOIX.micro === 'ok' ? (VOIX.coupe ? 'micro coupé' : 'micro ouvert')
-           : (VOIX.micro === 'refuse' ? 'écoute seule, le navigateur a refusé le micro' : 'autorisation du micro…');
+           : (VOIX.micro === 'refuse' ? 'le navigateur a refusé le micro' : 'autorisation du micro…');
   var barres = '';
   for(var i = 0; i < 7; i++) barres += '<i></i>';
   dock.innerHTML = '<span class="vu' + (VOIX.coupe ? ' coupe' : '') + '" id="vu" aria-hidden="true">' + barres + '</span>'
-    + '<div><div class="titre">La salle · ' + nbDansLaSalle() + ' personnes</div>'
+    + '<div><div class="titre">La salle · vous seul</div>'
     + '<div class="sous">' + ech(etat) + (VOIX.micro === 'ok' ? ' · barre d’espace pour parler' : '') + '</div></div>'
     + '<div class="outils">'
     + '<button class="o" data-voix="micro" aria-pressed="' + VOIX.coupe + '" aria-label="'
@@ -678,11 +662,10 @@ function rendreDock(){
 function majVu(){
   var vu = document.getElementById('vu');
   if(!vu) return;
-  var barres = vu.children, n = barres.length;
+  var b = vu.children, n = b.length;
   for(var i = 0; i < n; i++){
     var centre = 1 - Math.abs(i - (n - 1) / 2) / n;
-    var haut = 3 + (VOIX.niveau / 100) * 19 * (0.55 + centre);
-    barres[i].style.height = Math.min(22, haut).toFixed(1) + 'px';
+    b[i].style.height = Math.min(22, 3 + (VOIX.niveau / 100) * 19 * (0.55 + centre)).toFixed(1) + 'px';
   }
 }
 
@@ -690,13 +673,12 @@ function majVu(){
 function boucle(){
   if(!VOIX.analyseur) return;
   VOIX.analyseur.getByteTimeDomainData(VOIX.tampon);
-  var somme = 0;
-  for(var i = 0; i < VOIX.tampon.length; i++){ var v = (VOIX.tampon[i] - 128) / 128; somme += v * v; }
-  VOIX.niveau = VOIX.coupe ? 0 : Math.min(100, Math.round(Math.sqrt(somme / VOIX.tampon.length) * 330));
+  var s = 0;
+  for(var i = 0; i < VOIX.tampon.length; i++){ var v = (VOIX.tampon[i] - 128) / 128; s += v * v; }
+  VOIX.niveau = VOIX.coupe ? 0 : Math.min(100, Math.round(Math.sqrt(s / VOIX.tampon.length) * 330));
   majVu();
   VOIX.raf = requestAnimationFrame(boucle);
 }
-
 function entrer(){
   if(VOIX.dedans) return;
   VOIX.dedans = true; VOIX.coupe = false; VOIX.micro = 'attente';
@@ -715,7 +697,6 @@ function entrer(){
     VOIX.raf = requestAnimationFrame(boucle);
   }).catch(function(){ VOIX.micro = 'refuse'; rendre(); });
 }
-
 function sortir(){
   if(VOIX.raf) cancelAnimationFrame(VOIX.raf);
   if(VOIX.flux) VOIX.flux.getTracks().forEach(function(t){ t.stop(); });
@@ -725,20 +706,14 @@ function sortir(){
   VOIX.dedans = false; VOIX.coupe = false; VOIX.micro = 'aucun'; VOIX.niveau = 0;
   rendre();
 }
-
-function couper(force){
-  VOIX.coupe = (typeof force === 'boolean') ? force : !VOIX.coupe;
+function couper(f){
+  VOIX.coupe = (typeof f === 'boolean') ? f : !VOIX.coupe;
   if(VOIX.flux) VOIX.flux.getAudioTracks().forEach(function(t){ t.enabled = !VOIX.coupe; });
-  if(VOIX.coupe){ VOIX.niveau = 0; majVu(); }
-  rendreDock();
-  majVu();
+  if(VOIX.coupe){ VOIX.niveau = 0; }
+  rendreDock(); majVu();
 }
-
 function partager(){
-  if(VOIX.ecran){
-    VOIX.ecran.getTracks().forEach(function(t){ t.stop(); });
-    VOIX.ecran = null; rendre(); return;
-  }
+  if(VOIX.ecran){ VOIX.ecran.getTracks().forEach(function(t){ t.stop(); }); VOIX.ecran = null; rendre(); return; }
   if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) return;
   navigator.mediaDevices.getDisplayMedia({video:true, audio:false}).then(function(flux){
     VOIX.ecran = flux;
@@ -750,15 +725,15 @@ function partager(){
 
 /* ===================================================== rendu */
 function rendre(){
-  rendreOnglets();
-  var v = document.getElementById('vue');
-  if(ET.vue === 'aujourdhui') v.innerHTML = vueAujourdhui();
-  else if(ET.vue === 'echanges') v.innerHTML = vueEchanges();
-  else if(ET.vue === 'ressources') v.innerHTML = vueRessources();
-  else v.innerHTML = vueDates();
+  rendreMenu();
+  var p = document.getElementById('page');
+  if(ET.vue === 'aujourdhui') p.innerHTML = vueAujourdhui();
+  else if(ET.vue === 'echanges') p.innerHTML = vueEchanges();
+  else if(ET.vue === 'ressources') p.innerHTML = vueRessources();
+  else p.innerHTML = vueDates();
 
   if(VOIX.ecran && ET.vue === 'aujourdhui'){
-    var salle = v.querySelector('.salle');
+    var salle = p.querySelector('.salle');
     if(salle){
       var boite = document.createElement('div');
       boite.className = 'ecran';
@@ -767,39 +742,41 @@ function rendre(){
       boite.querySelector('video').srcObject = VOIX.ecran;
     }
   }
-  rendreDock();
-  majVu();
+  rendreDock(); majVu();
   var r = document.getElementById('reponse');
   if(r) r.focus();
 }
 
 /* ===================================================== interactions */
+document.getElementById('burger').addEventListener('click', function(){
+  ET.menuOuvert = !ET.menuOuvert;
+  rendreMenu();
+});
+
 document.addEventListener('click', function(e){
   if(e.target.id === 'publier'){
     var txt = ET.brouillon.trim();
     if(txt.length < 3) return;
-    ET.nouveaux.unshift({id:'n' + Date.now(), qui:MOI, type:ET.type, h:0, txt:txt, rep:[]});
+    FIL.unshift({id:'m' + Date.now(), qui:MOI.id, type:ET.type, t:Date.now(), txt:txt, rep:[]});
     ET.brouillon = '';
     rendre();
     return;
   }
 
-  var el = e.target.closest('[data-vue],[data-aller],[data-filtre],[data-type],[data-repondre],[data-utile],[data-deplier],[data-envoyer],[data-annuler],[data-inscrire],[data-voix],[data-prendre]');
+  var el = e.target.closest('[data-vue],[data-region],[data-profil],[data-type],[data-repondre],[data-utile],[data-envoyer],[data-annuler],[data-voix],[data-menu]');
   if(!el) return;
 
-  if(el.dataset.vue || el.dataset.aller){
-    ET.vue = el.dataset.vue || el.dataset.aller;
-    ET.repond = null;
+  if(el.dataset.menu === 'fermer'){ ET.menuOuvert = false; rendreMenu(); return; }
+  if(el.dataset.vue){
+    ET.vue = el.dataset.vue; ET.repond = null; ET.menuOuvert = false;
     window.scrollTo({top:0, behavior:'smooth'});
     rendre(); return;
   }
-  if(el.dataset.filtre){ ET.filtre = el.dataset.filtre; rendre(); return; }
+  if(el.dataset.region){ ET.region = el.dataset.region; ET.menuOuvert = false; rendre(); return; }
+  if(el.dataset.profil){ ET.profil = el.dataset.profil; ET.menuOuvert = false; rendre(); return; }
   if(el.dataset.type){ ET.type = el.dataset.type; rendre(); return; }
   if(el.dataset.repondre){
-    var venuDeAilleurs = ET.vue !== 'echanges';
-    ET.vue = 'echanges';
-    if(venuDeAilleurs) ET.filtre = 'tout';
-    ET.repond = el.dataset.repondre;
+    ET.vue = 'echanges'; ET.repond = el.dataset.repondre;
     rendre();
     var champ = document.getElementById('reponse');
     if(champ) champ.closest('.mot').scrollIntoView({behavior:'smooth', block:'center'});
@@ -810,32 +787,16 @@ document.addEventListener('click', function(e){
     if(ET.utiles[u]) delete ET.utiles[u]; else ET.utiles[u] = 1;
     rendre(); return;
   }
-  if(el.dataset.deplier){
-    var d = el.dataset.deplier;
-    if(ET.deplie[d]) delete ET.deplie[d]; else ET.deplie[d] = 1;
-    rendre(); return;
-  }
   if(el.dataset.envoyer){
     var zone = document.getElementById('reponse');
     var rep = zone ? zone.value.trim() : '';
     if(rep.length < 2) return;
-    var cible = tousLesMots().filter(function(m){ return m.id === el.dataset.envoyer; })[0];
-    if(cible){ cible.rep = cible.rep || []; cible.rep.push({qui:MOI, h:0, txt:rep}); }
+    var cible = FIL.filter(function(m){ return m.id === el.dataset.envoyer; })[0];
+    if(cible) cible.rep.push({qui:MOI.id, t:Date.now(), txt:rep});
     ET.repond = null;
     rendre(); return;
   }
   if(el.dataset.annuler){ ET.repond = null; rendre(); return; }
-  if(el.dataset.inscrire){
-    var i = el.dataset.inscrire;
-    if(ET.inscrit[i]) delete ET.inscrit[i]; else ET.inscrit[i] = 1;
-    rendre(); return;
-  }
-  if(el.dataset.prendre){
-    var t = el.textContent;
-    el.textContent = 'Dans vos fichiers';
-    setTimeout(function(){ el.textContent = t; }, 1700);
-    return;
-  }
   if(el.dataset.voix === 'entrer'){ entrer(); return; }
   if(el.dataset.voix === 'sortir'){ sortir(); return; }
   if(el.dataset.voix === 'micro'){ couper(); return; }
@@ -859,6 +820,7 @@ document.addEventListener('input', function(e){
 
 document.addEventListener('keydown', function(e){
   var champ = /^(INPUT|TEXTAREA)$/.test(e.target.tagName);
+  if(e.key === 'Escape' && ET.menuOuvert){ ET.menuOuvert = false; rendreMenu(); return; }
   if(e.code === 'Space' && !champ && VOIX.dedans && VOIX.micro === 'ok'){
     e.preventDefault();
     if(!VOIX.ptt){ VOIX.ptt = true; VOIX.pttTemp = VOIX.coupe; couper(!VOIX.coupe); }
