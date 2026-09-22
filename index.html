@@ -258,6 +258,17 @@
   .ecran video{display:block; width:100%; max-height:44vh; background:#000;}
   .ecran .lg{position:absolute; top:10px; left:10px; background:rgba(0,0,0,.66); color:#fff; font-size:12px; padding:3px 9px; border-radius:6px;}
 
+  .acces{max-width:440px; margin:8vh auto 0;}
+  .acces h1{font-size:30px; margin-bottom:12px;}
+  .acces p{color:var(--encre-2); margin-bottom:20px;}
+  .acces .sur-titre{margin-bottom:10px;}
+  .form-acces{display:grid; gap:10px;}
+  .form-acces input{
+    width:100%; padding:11px 14px; font:inherit; color:inherit;
+    background:var(--blanc); border:1px solid var(--trait); border-radius:10px; outline:none;
+  }
+  .form-acces input:focus{border-color:var(--canard);}
+  .alerte{margin-top:16px; padding:11px 14px; border-radius:10px; background:var(--cuivre-clair); color:var(--cuivre); font-size:14px;}
   .pied{border-top:1px solid var(--trait); margin-top:44px; padding-top:18px; font-size:13px; color:var(--encre-3); max-width:60ch;}
 
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
@@ -265,11 +276,8 @@
 </head>
 <body>
 
-<div class="bandeau">
-  <div class="dedans">
-    <b>Maquette</b>
-    <span>Ce que vous écrivez reste dans cet onglet : rien n'est envoyé, partagé, ni conservé après un rechargement. Il manque la partie serveur.</span>
-  </div>
+<div class="bandeau" id="bandeau" hidden>
+  <div class="dedans" id="bandeau-texte"></div>
 </div>
 
 <header class="top">
@@ -289,6 +297,7 @@
 
 <div id="dock"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js"></script>
 <script>
 (function(){
 "use strict";
@@ -299,8 +308,32 @@
    les deux profils, et la personne connectée.
    ============================================================ */
 
-var MOI = {id:'moi', nom:'Lionel Boutellier', ini:'LB', metier:'Animation du réseau', region:'aura', profil:'anim'};
+/* ------------------------------------------------------------------
+   Branchement Supabase. Tant que ces deux lignes sont vides, le site
+   tourne en maquette : ce qu'on écrit reste dans l'onglet.
+   Où les trouver : Supabase → Project Settings → Data API →
+   « Project URL », et la clé « publishable » (anon).
+   Elles sont publiques par nature : ce sont les règles RLS qui
+   protègent les données, jamais le secret de la clé. Ne JAMAIS mettre
+   ici la clé « service_role ».
+   ------------------------------------------------------------------ */
+var SUPABASE_URL = '';
+var SUPABASE_KEY = '';
+
+var EN_LIGNE = !!(SUPABASE_URL && SUPABASE_KEY && window.supabase);
+var sb = EN_LIGNE ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+/* etat : maquette | chargement | connexion | envoye | non-membre | pret */
+var SESSION = {etat: EN_LIGNE ? 'chargement' : 'maquette', email:'', message:'', occupe:false};
+
+var MOI = {id:'moi', nom:'Vous', ini:'VO', metier:'', region:'aura', profil:'anim'};
 var GENS = {}; GENS[MOI.id] = MOI;
+
+function initiales(nom){
+  var m = String(nom || '').trim().split(/\s+/).filter(Boolean);
+  if(!m.length) return '??';
+  return (m.length === 1 ? m[0].slice(0,2) : m[0][0] + m[m.length-1][0]).toUpperCase();
+}
 
 var REGIONS = [
   {id:'aura', nom:'Auvergne-Rhône-Alpes'},
@@ -331,6 +364,128 @@ var FIL = [];
 var RESSOURCES = [];
 var DATES = [];
 var DANS_LA_SALLE = [];
+
+/* ===================================================== Supabase */
+async function initialiser(){
+  var res = await sb.auth.getSession();
+  ecouterAuth();
+  if(!res.data.session){ SESSION.etat = 'connexion'; rendre(); return; }
+  await ouvrirSession();
+}
+
+function ecouterAuth(){
+  sb.auth.onAuthStateChange(function(evenement){
+    if(evenement === 'SIGNED_IN' && SESSION.etat !== 'pret') ouvrirSession();
+    if(evenement === 'SIGNED_OUT'){ SESSION.etat = 'connexion'; FIL = []; rendre(); }
+  });
+}
+
+async function ouvrirSession(){
+  SESSION.etat = 'chargement'; rendre();
+  var u = await sb.auth.getUser();
+  var compte = u.data && u.data.user;
+  if(!compte){ SESSION.etat = 'connexion'; rendre(); return; }
+  SESSION.email = compte.email || '';
+
+  var fiche = await sb.from('membres').select('*').eq('id', compte.id).maybeSingle();
+  if(fiche.error || !fiche.data){ SESSION.etat = 'non-membre'; rendre(); return; }
+
+  MOI = {id:fiche.data.id, nom:fiche.data.nom || SESSION.email, ini:initiales(fiche.data.nom || SESSION.email),
+         metier:fiche.data.metier || '', region:fiche.data.region || 'aura', profil:fiche.data.profil || 'metier'};
+  GENS[MOI.id] = MOI;
+
+  SESSION.etat = 'pret';
+  await chargerTout();
+  abonner();
+  rendre();
+}
+
+async function chargerTout(){
+  var gens = await sb.from('membres').select('id,nom,metier,region,profil');
+  if(gens.data){
+    GENS = {};
+    gens.data.forEach(function(m){
+      GENS[m.id] = {id:m.id, nom:m.nom || 'Sans nom', ini:initiales(m.nom), metier:m.metier || '',
+                    region:m.region || 'aura', profil:m.profil || 'metier'};
+    });
+    if(GENS[MOI.id]) MOI = GENS[MOI.id]; else GENS[MOI.id] = MOI;
+  }
+
+  var msg = await sb.from('messages')
+    .select('id,auteur,type,texte,cree_le,reponses(id,auteur,texte,cree_le),utiles(membre)')
+    .order('cree_le', {ascending:false});
+  if(msg.error){ SESSION.message = 'Lecture impossible : ' + msg.error.message; FIL = []; return; }
+
+  ET.utiles = {};
+  FIL = (msg.data || []).map(function(m){
+    if((m.utiles || []).some(function(u){ return u.membre === MOI.id; })) ET.utiles[m.id] = 1;
+    return {
+      id:m.id, qui:m.auteur, type:m.type, txt:m.texte, t:new Date(m.cree_le).getTime(),
+      nbUtiles:(m.utiles || []).length,
+      rep:(m.reponses || []).sort(function(a,b){ return new Date(a.cree_le) - new Date(b.cree_le); })
+          .map(function(r){ return {qui:r.auteur, txt:r.texte, t:new Date(r.cree_le).getTime()}; })
+    };
+  });
+
+  var ev = await sb.from('evenements').select('id,titre,le_jour,horaire,lieu,visio,places').order('le_jour');
+  DATES = (ev.data || []).map(function(e){
+    return {id:e.id, iso:e.le_jour, t:e.titre,
+            ou:[e.horaire, e.lieu].filter(Boolean).join(' · '), visio:e.visio};
+  });
+}
+
+var canal = null, minuteur = null;
+function abonner(){
+  if(canal) return;
+  canal = sb.channel('maillage')
+    .on('postgres_changes', {event:'*', schema:'public', table:'messages'}, rafraichir)
+    .on('postgres_changes', {event:'*', schema:'public', table:'reponses'}, rafraichir)
+    .subscribe();
+}
+function rafraichir(){
+  clearTimeout(minuteur);
+  minuteur = setTimeout(function(){ chargerTout().then(rendre); }, 400);
+}
+
+async function envoyerLien(email){
+  SESSION.occupe = true; SESSION.message = ''; rendre();
+  var r = await sb.auth.signInWithOtp({email:email, options:{emailRedirectTo:location.origin}});
+  SESSION.occupe = false;
+  if(r.error){ SESSION.message = r.error.message; rendre(); return; }
+  SESSION.email = email; SESSION.etat = 'envoye'; rendre();
+}
+
+async function seDeconnecter(){ await sb.auth.signOut(); }
+
+async function publierMot(txt, type){
+  if(!EN_LIGNE){
+    FIL.unshift({id:'m' + Date.now(), qui:MOI.id, type:type, t:Date.now(), txt:txt, rep:[], nbUtiles:0});
+    return;
+  }
+  var r = await sb.from('messages').insert({auteur:MOI.id, type:type, texte:txt});
+  if(r.error){ SESSION.message = 'Publication refusée : ' + r.error.message; return; }
+  await chargerTout();
+}
+
+async function publierReponse(idMessage, txt){
+  if(!EN_LIGNE){
+    var c = FIL.filter(function(m){ return m.id === idMessage; })[0];
+    if(c) c.rep.push({qui:MOI.id, t:Date.now(), txt:txt});
+    return;
+  }
+  var r = await sb.from('reponses').insert({message:idMessage, auteur:MOI.id, texte:txt});
+  if(r.error){ SESSION.message = 'Réponse refusée : ' + r.error.message; return; }
+  await chargerTout();
+}
+
+async function basculerUtile(idMessage){
+  var avant = !!ET.utiles[idMessage];
+  if(avant) delete ET.utiles[idMessage]; else ET.utiles[idMessage] = 1;
+  if(!EN_LIGNE) return;
+  if(avant) await sb.from('utiles').delete().eq('message', idMessage).eq('membre', MOI.id);
+  else      await sb.from('utiles').insert({message:idMessage, membre:MOI.id});
+  await chargerTout();
+}
 
 /* ===================================================== état */
 var ET = {
@@ -558,7 +713,7 @@ function ligneMot(m){
   h += '<div class="actions">'
     + '<button class="lien" data-repondre="' + m.id + '">Répondre</button>'
     + '<button class="lien" data-utile="' + m.id + '"' + (utile ? ' style="color:var(--pousse)"' : '') + '>'
-    + (utile ? 'Noté comme utile' : 'Utile') + '</button></div>';
+    + (utile ? 'Noté comme utile' : 'Utile') + (m.nbUtiles ? ' · ' + m.nbUtiles : '') + '</button></div>';
 
   if(m.rep.length){
     h += '<div class="reponses">' + m.rep.map(function(r){
@@ -624,7 +779,21 @@ function ligneDate(d){
     + '<div class="cta"><button class="b petit">Je viens</button></div></div>';
 }
 
+function majBandeau(){
+  var b = document.getElementById('bandeau');
+  var t = document.getElementById('bandeau-texte');
+  if(!b || !t) return;
+  if(EN_LIGNE){ b.hidden = true; return; }
+  b.hidden = false;
+  t.innerHTML = '<b>Maquette</b><span>Ce que vous écrivez reste dans cet onglet : rien n’est envoyé, '
+    + 'partagé, ni conservé après un rechargement. La base de données n’est pas encore branchée.</span>';
+}
+
 function pied(){
+  if(EN_LIGNE && SESSION.etat === 'pret'){
+    return '<p class="pied">Connecté comme ' + ech(MOI.nom) + '. Les messages sont partagés avec le groupe '
+      + 'et arrivent en direct. <button class="lien" data-acces="sortir">Se déconnecter</button></p>';
+  }
   return '<p class="pied">Espace vierge : aucun membre, aucun message, aucune ressource. '
     + 'La structure — régions, profils, salle — attend d’être reliée à une base de données partagée.</p>';
 }
@@ -723,8 +892,48 @@ function partager(){
   }).catch(function(){});
 }
 
+/* ===================================================== écrans d'accès */
+function vueAcces(){
+  var h = '<div class="acces">';
+  if(SESSION.etat === 'chargement'){
+    h += '<h1>Un instant…</h1><p>Ouverture de votre espace.</p>';
+  } else if(SESSION.etat === 'connexion'){
+    h += '<div class="sur-titre">Le Maillage</div>'
+      + '<h1>Entrer dans l’espace du groupe</h1>'
+      + '<p>Indiquez l’adresse avec laquelle vous avez été invité. Vous recevrez un lien de connexion : '
+      + 'aucun mot de passe à retenir, rien à installer.</p>'
+      + '<form id="form-connexion" class="form-acces">'
+      + '<input id="email" type="email" required autocomplete="email" placeholder="vous@exemple.fr" value="' + ech(SESSION.email) + '">'
+      + '<button class="b" type="submit"' + (SESSION.occupe ? ' disabled' : '') + '>'
+      + (SESSION.occupe ? 'Envoi…' : 'Recevoir le lien') + '</button></form>';
+  } else if(SESSION.etat === 'envoye'){
+    h += '<div class="sur-titre">Courrier parti</div>'
+      + '<h1>Regardez votre boîte</h1>'
+      + '<p>Un lien de connexion vient d’être envoyé à <b>' + ech(SESSION.email) + '</b>. '
+      + 'Il ouvre directement votre espace. Pensez au dossier des indésirables.</p>'
+      + '<button class="b creux" data-acces="retour">Utiliser une autre adresse</button>';
+  } else if(SESSION.etat === 'non-membre'){
+    h += '<div class="sur-titre">Accès réservé</div>'
+      + '<h1>Cette adresse n’est pas encore invitée</h1>'
+      + '<p>Vous êtes bien connecté avec <b>' + ech(SESSION.email) + '</b>, mais elle ne figure pas dans la '
+      + 'liste du groupe. Demandez à l’animation de vous ajouter, puis reconnectez-vous.</p>'
+      + '<button class="b creux" data-acces="sortir">Se déconnecter</button>';
+  }
+  if(SESSION.message) h += '<p class="alerte">' + ech(SESSION.message) + '</p>';
+  return h + '</div>';
+}
+
 /* ===================================================== rendu */
 function rendre(){
+  majBandeau();
+  if(EN_LIGNE && SESSION.etat !== 'pret'){
+    document.getElementById('menu').innerHTML = '';
+    document.getElementById('page').innerHTML = vueAcces();
+    document.getElementById('dock').innerHTML = '';
+    var saisie = document.getElementById('email');
+    if(saisie && document.activeElement !== saisie) saisie.focus();
+    return;
+  }
   rendreMenu();
   var p = document.getElementById('page');
   if(ET.vue === 'aujourdhui') p.innerHTML = vueAujourdhui();
@@ -757,15 +966,17 @@ document.addEventListener('click', function(e){
   if(e.target.id === 'publier'){
     var txt = ET.brouillon.trim();
     if(txt.length < 3) return;
-    FIL.unshift({id:'m' + Date.now(), qui:MOI.id, type:ET.type, t:Date.now(), txt:txt, rep:[]});
     ET.brouillon = '';
-    rendre();
+    e.target.disabled = true;
+    Promise.resolve(publierMot(txt, ET.type)).then(rendre);
     return;
   }
 
-  var el = e.target.closest('[data-vue],[data-region],[data-profil],[data-type],[data-repondre],[data-utile],[data-envoyer],[data-annuler],[data-voix],[data-menu]');
+  var el = e.target.closest('[data-vue],[data-region],[data-profil],[data-type],[data-repondre],[data-utile],[data-envoyer],[data-annuler],[data-voix],[data-menu],[data-acces]');
   if(!el) return;
 
+  if(el.dataset.acces === 'sortir'){ seDeconnecter(); return; }
+  if(el.dataset.acces === 'retour'){ SESSION.etat = 'connexion'; SESSION.message = ''; rendre(); return; }
   if(el.dataset.menu === 'fermer'){ ET.menuOuvert = false; rendreMenu(); return; }
   if(el.dataset.vue){
     ET.vue = el.dataset.vue; ET.repond = null; ET.menuOuvert = false;
@@ -783,18 +994,16 @@ document.addEventListener('click', function(e){
     return;
   }
   if(el.dataset.utile){
-    var u = el.dataset.utile;
-    if(ET.utiles[u]) delete ET.utiles[u]; else ET.utiles[u] = 1;
+    Promise.resolve(basculerUtile(el.dataset.utile)).then(rendre);
     rendre(); return;
   }
   if(el.dataset.envoyer){
     var zone = document.getElementById('reponse');
-    var rep = zone ? zone.value.trim() : '';
-    if(rep.length < 2) return;
-    var cible = FIL.filter(function(m){ return m.id === el.dataset.envoyer; })[0];
-    if(cible) cible.rep.push({qui:MOI.id, t:Date.now(), txt:rep});
+    var texteRep = zone ? zone.value.trim() : '';
+    if(texteRep.length < 2) return;
     ET.repond = null;
-    rendre(); return;
+    Promise.resolve(publierReponse(el.dataset.envoyer, texteRep)).then(rendre);
+    return;
   }
   if(el.dataset.annuler){ ET.repond = null; rendre(); return; }
   if(el.dataset.voix === 'entrer'){ entrer(); return; }
@@ -830,9 +1039,19 @@ document.addEventListener('keyup', function(e){
   if(e.code === 'Space' && VOIX.ptt){ VOIX.ptt = false; couper(VOIX.pttTemp); }
 });
 
+document.addEventListener('submit', function(e){
+  if(e.target.id !== 'form-connexion') return;
+  e.preventDefault();
+  var saisie = document.getElementById('email');
+  var email = saisie ? saisie.value.trim() : '';
+  if(email.indexOf('@') < 1) return;
+  envoyerLien(email);
+});
+
 document.getElementById('jour').textContent =
   new Date().toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
-rendre();
+
+if(EN_LIGNE) initialiser(); else rendre();
 })();
 </script>
 </body>
