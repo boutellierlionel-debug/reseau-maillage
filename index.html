@@ -505,7 +505,8 @@ function vueEchanges(){
   var filtres = [
     {id:'tout', nom:'Tout', n:tousLesMots().length},
     {id:'region', nom:'Ma région', n:tousLesMots().filter(function(m){ return G[m.qui].region === moi.region; }).length},
-    {id:'voie', nom:'Ma voie', n:tousLesMots().filter(function(m){ return G[m.qui].voie === moi.voie; }).length},
+    {id:'conseil', nom:'Conseillers', n:tousLesMots().filter(function(m){ return G[m.qui].voie === 'conseil'; }).length},
+    {id:'metier', nom:'Dans mon métier', n:tousLesMots().filter(function(m){ return G[m.qui].voie === 'metier'; }).length},
     {id:'attente', nom:'Sans réponse', n:sansReponse().length}
   ];
   h += '<div class="filtres">' + filtres.map(function(f){
@@ -515,7 +516,7 @@ function vueEchanges(){
 
   var liste = tousLesMots().filter(function(m){
     if(ET.filtre === 'region') return G[m.qui].region === moi.region;
-    if(ET.filtre === 'voie') return G[m.qui].voie === moi.voie;
+    if(ET.filtre === 'conseil' || ET.filtre === 'metier') return G[m.qui].voie === ET.filtre;
     if(ET.filtre === 'attente') return m.type === 'question' && !(m.rep && m.rep.length);
     return true;
   }).sort(function(a, b){ return a.h - b.h; });
